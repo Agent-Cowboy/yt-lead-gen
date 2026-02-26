@@ -1,0 +1,40 @@
+# Environment variables
+.env
+
+# Screenshots (temporary)
+screenshots/
+
+# Generated PDFs
+pdfs/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-*
+
+# Playwright browsers (large, installed at build time)
+.playwright/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log

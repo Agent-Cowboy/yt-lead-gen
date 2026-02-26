@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YT Lead Gen — Free YouTube Channel PDF Report Generator</title>
+    <meta
+      name="description"
+      content="Free YouTube lead generation tool. Screenshot channels, create PDF reports for YouTuber outreach. No signup needed. Built for freelancers."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://ytleadgen.onrender.com/" />
+
+    <!-- Open Graph (Facebook, LinkedIn, Reddit) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="YT Lead Gen — Free YouTube Channel PDF Report Generator" />
+    <meta property="og:description" content="Screenshot YouTube channels and generate PDF reports for outreach. Free, no signup, no tracking." />
+    <meta property="og:url" content="https://ytleadgen.onrender.com/" />
+    <meta property="og:site_name" content="YT Lead Gen" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="YT Lead Gen — Free YouTube Channel PDF Report Generator" />
+    <meta name="twitter:description" content="Screenshot YouTube channels and generate PDF reports for outreach. Free, no signup." />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "YT Lead Gen",
+      "url": "https://ytleadgen.onrender.com/",
+      "description": "Free YouTube lead generation tool. Screenshot channels, create PDF reports for outreach.",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "browserRequirements": "Requires a modern web browser"
+    }
+    </script>
+
+    <!-- Favicon (emoji-based data URI) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>▶</text></svg>" />
+
+    <!-- Preconnect to CDNs -->
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: {
+                900: "#0F172A",
+                800: "#1E293B",
+                700: "#334155",
+                600: "#475569",
+              },
+              accent: {
+                DEFAULT: "#FF4500",
+                hover: "#FF5722",
+                light: "#FF6B3D",
+                glow: "rgba(255, 69, 0, 0.3)",
+              },
+            },
+            fontFamily: {
+              sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background-color: #0f172a;
+        color: #e2e8f0;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+      }
+
+      /* Animated gradient background */
+      .hero-bg {
+        background: linear-gradient(
+          135deg,
+          #0f172a 0%,
+          #1a1f3a 40%,
+          #0f172a 100%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+      .hero-bg::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background:
+          radial-gradient(
+            ellipse at 30% 50%,
+            rgba(255, 69, 0, 0.06) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse at 70% 20%,
+            rgba(255, 107, 61, 0.04) 0%,
+            transparent 50%
+          );
+        animation: bgPulse 8s ease-in-out infinite alternate;
+      }
+      @keyframes bgPulse {
+        0% {
+          transform: translate(0, 0) scale(1);
+        }
+        100% {
+          transform: translate(-2%, 3%) scale(1.05);
+        }
+      }
+
+      /* Glow button */
+      .btn-glow {
+        position: relative;
+        background: linear-gradient(135deg, #ff4500, #ff6b3d);
+        transition: all 0.3s ease;
+        box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
+      }
+      .btn-glow:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 0 40px rgba(255, 69, 0, 0.5);
+      }
+      .btn-glow:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      /* Download button */
+      .btn-download {
+        background: linear-gradient(135deg, #10b981, #059669);
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+      }
+      .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0 45px rgba(16, 185, 129, 0.5);
+      }
+
+      /* Progress bar */
+      .progress-track {
+        background: #1e293b;
+        border-radius: 999px;
+        overflow: hidden;
+        height: 10px;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, #ff4500, #ff6b3d, #ff4500);
+        background-size: 200% 100%;
+        animation: progressShimmer 2s linear infinite;
+        transition: width 0.5s ease;
+      }
+      @keyframes progressShimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      /* Step cards */
+      .step-card {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        transition: all 0.3s ease;
+      }
+      .step-card:hover {
+        border-color: rgba(255, 69, 0, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Textarea */
+      .textarea-custom {
+        background: #1e293b;
+        border: 2px solid #334155;
+        transition:
+          border-color 0.3s ease,
+          box-shadow 0.3s ease;
+        resize: vertical;
+      }
+      .textarea-custom:focus {
+        border-color: #ff4500;
+        box-shadow: 0 0 0 3px rgba(255, 69, 0, 0.15);
+        outline: none;
+      }
+
+      /* Counter badge */
+      .counter-badge {
+        background: linear-gradient(135deg, #ff4500, #ff6b3d);
+        transition: all 0.3s ease;
+      }
+      .counter-badge.zero {
+        background: #334155;
+      }
+
+      /* Glass card */
+      .glass-card {
+        background: rgba(30, 41, 59, 0.5);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      /* Fade in animation */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+      }
+
+      /* Spinner */
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Pulse animation for icons */
+      @keyframes iconPulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+      .step-icon {
+        animation: iconPulse 3s ease-in-out infinite;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #475569;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hero-bg min-h-screen">
+      <div class="relative z-10">
+        <!-- ─── HEADER ─── -->
+        <header class="pt-8 pb-4 px-4 text-center">
+          <div class="fade-in-up" style="animation-delay: 0.1s">
+            <div class="inline-flex items-center gap-3 mb-4">
+              <div
+                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-accent to-accent-light flex items-center justify-center shadow-lg"
+              >
+                <svg
+                  class="w-6 h-6 sm:w-7 sm:h-7 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <h1
+                class="text-3xl sm:text-4xl font-black tracking-tight text-white"
+              >
+                YT Lead Gen
+              </h1>
+            </div>
+            <p
+              class="text-base sm:text-lg text-slate-400 max-w-xl mx-auto leading-relaxed"
+            >
+              Screenshot YouTube channels and generate a PDF report.
+            </p>
+          </div>
+        </header>
+
+        <!-- ─── HOW IT WORKS ─── -->
+        <section class="px-4 py-6 max-w-4xl mx-auto">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div
+              class="step-card rounded-2xl p-5 text-center fade-in-up"
+              style="animation-delay: 0.2s"
+            >
+              <div
+                class="step-icon w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-3"
+              >
+                <svg
+                  class="w-7 h-7 text-accent"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
+                </svg>
+              </div>
+              <div
+                class="text-xs font-bold text-accent uppercase tracking-wider mb-1"
+              >
+                Step 1
+              </div>
+              <h3 class="text-sm font-bold text-white mb-1">Paste Channels</h3>
+              <p class="text-xs text-slate-400">
+                Drop YouTube URLs or @handles, one per line
+              </p>
+            </div>
+
+            <div
+              class="step-card rounded-2xl p-5 text-center fade-in-up"
+              style="animation-delay: 0.35s"
+            >
+              <div
+                class="step-icon w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-3"
+                style="animation-delay: 1s"
+              >
+                <svg
+                  class="w-7 h-7 text-accent"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+              </div>
+              <div
+                class="text-xs font-bold text-accent uppercase tracking-wider mb-1"
+              >
+                Step 2
+              </div>
+              <h3 class="text-sm font-bold text-white mb-1">We Screenshot</h3>
+              <p class="text-xs text-slate-400">
+                Each channel's videos page, captured in HD
+              </p>
+            </div>
+
+            <div
+              class="step-card rounded-2xl p-5 text-center fade-in-up"
+              style="animation-delay: 0.5s"
+            >
+              <div
+                class="step-icon w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-3"
+                style="animation-delay: 2s"
+              >
+                <svg
+                  class="w-7 h-7 text-accent"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+              </div>
+              <div
+                class="text-xs font-bold text-accent uppercase tracking-wider mb-1"
+              >
+                Step 3
+              </div>
+              <h3 class="text-sm font-bold text-white mb-1">Download PDF</h3>
+              <p class="text-xs text-slate-400">
+                Your pitch deck — ready to send to clients
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─── MAIN TOOL ─── -->
+        <main class="px-4 pb-16 max-w-2xl mx-auto">
+          <div
+            class="glass-card rounded-3xl p-6 sm:p-8 fade-in-up"
+            style="animation-delay: 0.6s"
+          >
+            <!-- Input Section -->
+            <div id="input-section">
+              <div class="flex items-center justify-between mb-4">
+                <label
+                  for="channel-input"
+                  class="text-sm font-semibold text-slate-300"
+                >
+                  YouTube Channels
+                </label>
+                <div
+                  id="counter-badge"
+                  class="counter-badge zero text-xs font-bold text-white px-3 py-1 rounded-full"
+                >
+                  0 channels
+                </div>
+              </div>
+
+              <textarea
+                id="channel-input"
+                class="textarea-custom w-full rounded-xl p-4 text-sm text-white placeholder-slate-500 font-mono"
+                rows="8"
+                placeholder="Paste YouTube channel URLs or @handles here, one per line&#10;&#10;Example:&#10;@mkbhd&#10;https://youtube.com/@veritasium&#10;https://www.youtube.com/c/LinusTechTips"
+                spellcheck="false"
+              ></textarea>
+
+              <p class="text-xs text-slate-500 mt-2 mb-5">
+                Max 30 channels per report • Supports @handles and full URLs
+              </p>
+
+              <button
+                id="generate-btn"
+                class="btn-glow w-full py-4 rounded-xl text-white font-bold text-base tracking-wide uppercase"
+                disabled
+                onclick="startGeneration()"
+              >
+                Generate PDF Report
+              </button>
+            </div>
+
+            <!-- Progress Section (hidden by default) -->
+            <div id="progress-section" class="hidden">
+              <div class="text-center mb-6">
+                <div class="spinner mb-3"></div>
+                <p id="progress-text" class="text-sm font-semibold text-white">
+                  Processing channel 0 of 0...
+                </p>
+                <p class="text-xs text-slate-500 mt-1">
+                  This can take 30-60 seconds per channel
+                </p>
+              </div>
+              <div class="progress-track">
+                <div
+                  id="progress-bar"
+                  class="progress-fill"
+                  style="width: 0%"
+                ></div>
+              </div>
+              <p
+                id="progress-percent"
+                class="text-xs text-slate-500 text-center mt-2"
+              >
+                0%
+              </p>
+            </div>
+
+            <!-- Download Section (hidden by default) -->
+            <div id="download-section" class="hidden text-center">
+              <div class="mb-4">
+                <div
+                  class="w-16 h-16 rounded-2xl bg-green-500/10 flex items-center justify-center mx-auto mb-3"
+                >
+                  <svg
+                    class="w-8 h-8 text-green-400"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">
+                  Your PDF is Ready
+                </h3>
+                <p class="text-sm text-slate-400">
+                  Download it now — link expires in 10 minutes
+                </p>
+              </div>
+
+              <a
+                id="download-btn"
+                href="#"
+                class="btn-download inline-flex items-center gap-2 px-8 py-4 rounded-xl text-white font-bold text-base tracking-wide uppercase"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Download PDF Report
+              </a>
+
+              <button
+                class="block mx-auto mt-5 text-sm text-slate-500 hover:text-accent transition-colors"
+                onclick="resetForm()"
+              >
+                ← Generate another report
+              </button>
+            </div>
+
+            <!-- Error Section (hidden by default) -->
+            <div id="error-section" class="hidden text-center">
+              <div class="mb-4">
+                <div
+                  class="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-3"
+                >
+                  <svg
+                    class="w-8 h-8 text-red-400"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">
+                  Something went wrong
+                </h3>
+                <p id="error-text" class="text-sm text-red-400"></p>
+              </div>
+              <button
+                class="text-sm text-slate-500 hover:text-accent transition-colors"
+                onclick="resetForm()"
+              >
+                ← Try again
+              </button>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <footer class="text-center mt-10 pt-6 border-t border-slate-800/50" aria-label="Site footer">
+            <p class="text-xs text-slate-500 mb-3">
+              Free YouTube channel screenshot tool. Built for freelancers and video editors.
+            </p>
+            <nav class="flex justify-center gap-4 text-xs text-slate-600 mb-3" aria-label="Footer navigation">
+              <a href="/" class="hover:text-accent transition-colors">Home</a>
+              <a href="/privacy" class="hover:text-accent transition-colors">Privacy Policy</a>
+              <a href="/terms" class="hover:text-accent transition-colors">Terms of Service</a>
+            </nav>
+            <p class="text-xs text-slate-700">
+              No data stored permanently. PDFs auto-deleted after 10 minutes.
+            </p>
+          </footer>
+        </main>
+      </div>
+    </div>
+
+    <!-- ─── JAVASCRIPT ─── -->
+    <script>
+      // ─── State ───
+      let currentJobId = null;
+      let pollInterval = null;
+
+      // ─── DOM Elements ───
+      const channelInput = document.getElementById("channel-input");
+      const counterBadge = document.getElementById("counter-badge");
+      const generateBtn = document.getElementById("generate-btn");
+      const inputSection = document.getElementById("input-section");
+      const progressSection = document.getElementById("progress-section");
+      const downloadSection = document.getElementById("download-section");
+      const errorSection = document.getElementById("error-section");
+      const progressText = document.getElementById("progress-text");
+      const progressBar = document.getElementById("progress-bar");
+      const progressPercent = document.getElementById("progress-percent");
+      const downloadBtn = document.getElementById("download-btn");
+      const errorText = document.getElementById("error-text");
+
+      // ─── Channel detection (matches backend url_extractor.py) ───
+      const HANDLE_RE = /@([\w.-]{1,100})/;
+      const URL_RE = /https?:\/\/(www\.)?youtube\.com\/(@[\w.-]+|c\/[\w.-]+|channel\/[\w-]+|user\/[\w.-]+)/;
+
+      function extractChannelFromLine(line) {
+        const trimmed = line.trim();
+        if (!trimmed) return null;
+
+        // Try full YouTube URL first
+        const urlMatch = trimmed.match(URL_RE);
+        if (urlMatch) return urlMatch[0].toLowerCase();
+
+        // Then try @handle anywhere in the line
+        const handleMatch = trimmed.match(HANDLE_RE);
+        if (handleMatch) return handleMatch[0].toLowerCase();
+
+        return null;
+      }
+
+      function countChannels(text) {
+        if (!text.trim()) return 0;
+        const lines = text.split("\n");
+        const unique = new Set();
+        for (const line of lines) {
+          const channel = extractChannelFromLine(line);
+          if (channel) {
+            unique.add(channel);
+          }
+        }
+        return Math.min(unique.size, 30);
+      }
+
+      // ─── Real-time channel counter ───
+      channelInput.addEventListener("input", () => {
+        const count = countChannels(channelInput.value);
+        counterBadge.textContent = `${count} channel${count !== 1 ? "s" : ""}`;
+
+        if (count > 0) {
+          counterBadge.classList.remove("zero");
+          generateBtn.disabled = false;
+        } else {
+          counterBadge.classList.add("zero");
+          generateBtn.disabled = true;
+        }
+      });
+
+      // ─── Show/Hide Sections ───
+      function showSection(section) {
+        inputSection.classList.add("hidden");
+        progressSection.classList.add("hidden");
+        downloadSection.classList.add("hidden");
+        errorSection.classList.add("hidden");
+        section.classList.remove("hidden");
+      }
+
+      // ─── Start Generation ───
+      async function startGeneration() {
+        const text = channelInput.value.trim();
+        if (!text) return;
+
+        const count = countChannels(text);
+        if (count === 0) return;
+
+        generateBtn.disabled = true;
+        showSection(progressSection);
+        progressBar.style.width = "0%";
+        progressPercent.textContent = "0%";
+        progressText.textContent = `Starting... (${count} channel${count !== 1 ? "s" : ""})`;
+
+        try {
+          const response = await fetch("/api/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ channels: text }),
+          });
+
+          let data;
+          const contentType = response.headers.get("content-type") || "";
+          if (contentType.includes("application/json")) {
+            data = await response.json();
+          } else {
+            const textBody = await response.text();
+            data = { detail: textBody || `Server error (${response.status})` };
+          }
+
+          if (!response.ok) {
+            throw new Error(data.detail || "Failed to start job");
+          }
+
+          currentJobId = data.job_id;
+          startPolling();
+        } catch (err) {
+          showError(err.message);
+        }
+      }
+
+      // ─── Poll Job Status ───
+      function startPolling() {
+        if (pollInterval) clearInterval(pollInterval);
+        pollInterval = setInterval(pollStatus, 2000);
+        pollStatus(); // immediate first poll
+      }
+
+      async function pollStatus() {
+        if (!currentJobId) return;
+
+        try {
+          const response = await fetch(`/api/status/${currentJobId}`);
+
+          let data;
+          const contentType = response.headers.get("content-type") || "";
+          if (contentType.includes("application/json")) {
+            data = await response.json();
+          } else {
+            const textBody = await response.text();
+            throw new Error(textBody || `Server error (${response.status})`);
+          }
+
+          if (!response.ok) {
+            throw new Error(data.detail || "Failed to fetch status");
+          }
+
+          const { status, progress, total, download_url, error } = data;
+
+          if (status === "processing" || status === "generating_pdf") {
+            const current = Math.min(progress + 1, total);
+            const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+
+            if (status === "generating_pdf") {
+              progressText.textContent = `Creating your PDF...`;
+              progressBar.style.width = "95%";
+              progressPercent.textContent = "95%";
+            } else {
+              progressText.textContent = `Processing channel ${current} of ${total}...`;
+              progressBar.style.width = `${Math.min(percent, 90)}%`;
+              progressPercent.textContent = `${Math.min(percent, 90)}%`;
+            }
+          }
+
+          if (status === "complete") {
+            stopPolling();
+            progressBar.style.width = "100%";
+            progressPercent.textContent = "100%";
+            progressText.textContent = "Done!";
+
+            setTimeout(() => {
+              downloadBtn.href = download_url;
+              showSection(downloadSection);
+            }, 500);
+          }
+
+          if (status === "failed") {
+            stopPolling();
+            showError(error || "Job failed. Please try again.");
+          }
+        } catch (err) {
+          // Don't stop polling on network hiccups
+          console.error("Poll error:", err);
+        }
+      }
+
+      function stopPolling() {
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
+      }
+
+      // ─── Show Error ───
+      function showError(message) {
+        stopPolling();
+        errorText.textContent = message;
+        showSection(errorSection);
+      }
+
+      // ─── Reset Form ───
+      function resetForm() {
+        currentJobId = null;
+        stopPolling();
+        channelInput.value = "";
+        counterBadge.textContent = "0 channels";
+        counterBadge.classList.add("zero");
+        generateBtn.disabled = true;
+        progressBar.style.width = "0%";
+        showSection(inputSection);
+      }
+    </script>
+  </body>
+</html>

@@ -60,7 +60,7 @@ memory_jobs: dict = {}
 try:
     import redis as redis_lib
     _test_client = redis_lib.from_url(
-        REDIS_URL, decode_responses=True, socket_connect_timeout=2
+        REDIS_URL, decode_responses=True, socket_connect_timeout=2, ssl_cert_reqs=None
     )
     _test_client.ping()
     redis_client = _test_client

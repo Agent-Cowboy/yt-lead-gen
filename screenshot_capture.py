@@ -10,18 +10,21 @@ from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeo
 
 logger = logging.getLogger(__name__)
 
-# Browser launch arguments for security and memory efficiency
+# Browser launch arguments for Linux without system deps
 BROWSER_ARGS = [
     '--no-sandbox',
+    '--disable-setuid-sandbox',
     '--disable-dev-shm-usage',
     '--disable-gpu',
+    '--disable-software-rasterizer',
     '--disable-extensions',
-    '--disable-background-timer-throttling',
-    '--disable-backgrounding-occluded-windows',
-    '--disable-renderer-backgrounding',
-    '--disable-features=TranslateUI',
+    '--no-zygote',
+    '--single-process',
+    '--lang=en-US',
+    '--disable-background-networking',
+    '--disable-default-apps',
+    '--disable-sync',
     '--no-first-run',
-    '--no-default-browser-check',
 ]
 
 # Screenshot dimensions

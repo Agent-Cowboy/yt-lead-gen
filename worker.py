@@ -5,6 +5,7 @@ Stores job progress in Redis for real-time status polling.
 """
 
 import os
+import ssl
 import uuid
 import shutil
 import logging
@@ -33,8 +34,8 @@ celery_app = Celery(
 )
 
 celery_app.conf.update(
-    broker_use_ssl={'ssl_cert_reqs': 'CERT_NONE'},
-    redis_backend_use_ssl={'ssl_cert_reqs': 'CERT_NONE'},
+    broker_use_ssl={'ssl_cert_reqs': ssl.CERT_NONE},
+    redis_backend_use_ssl={'ssl_cert_reqs': ssl.CERT_NONE},
     task_serializer='json',
     accept_content=['json'],
     result_serializer='json',

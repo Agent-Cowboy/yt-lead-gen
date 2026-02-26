@@ -9,6 +9,7 @@ Supports two modes:
 
 import os
 import re
+import ssl
 import uuid
 import asyncio
 import logging
@@ -60,7 +61,10 @@ memory_jobs: dict = {}
 try:
     import redis as redis_lib
     _test_client = redis_lib.from_url(
-        REDIS_URL, decode_responses=True, socket_connect_timeout=2, ssl_cert_reqs=None
+        REDIS_URL,
+        decode_responses=True,
+        socket_connect_timeout=2,
+        ssl_cert_reqs=ssl.CERT_NONE
     )
     _test_client.ping()
     redis_client = _test_client

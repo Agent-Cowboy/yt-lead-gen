@@ -79,8 +79,13 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
             page = context.new_page()
 
             # Navigate to the videos page
+            # NOTE: 'domcontentloaded' is used instead of 'networkidle' because
+            # YouTube never reaches network-idle (constant analytics/ads traffic).
             logger.info(f"Navigating to: {videos_url}")
-            page.goto(videos_url, wait_until='networkidle', timeout=25000)
+            page.goto(videos_url, wait_until='domcontentloaded', timeout=30000)
+
+            # Wait for page content to render after DOM is ready
+            page.wait_for_timeout(2000)
 
             # Dismiss cookie/consent banners if present
             try:

@@ -1,7 +1,7 @@
 """
 screenshot_capture.py — Playwright browser automation.
 Launches headless Chromium, navigates to a YouTube channel's /videos page,
-scrolls to load content, captures a full screenshot, and extracts the channel name.
+scrolls to load content, captures a screenshot, and extracts the channel name.
 """
 
 import os
@@ -10,7 +10,7 @@ from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeo
 
 logger = logging.getLogger(__name__)
 
-# Browser launch arguments for Linux without system deps
+# Browser launch arguments for Linux without system deps + speed
 BROWSER_ARGS = [
     '--no-sandbox',
     '--disable-setuid-sandbox',
@@ -25,15 +25,18 @@ BROWSER_ARGS = [
     '--disable-default-apps',
     '--disable-sync',
     '--no-first-run',
+    '--disable-background-timer-throttling',
+    '--disable-backgrounding-occluded-windows',
+    '--disable-renderer-backgrounding',
 ]
 
 # Screenshot dimensions
 VIEWPORT_WIDTH = 1920
-VIEWPORT_HEIGHT = 2800
+VIEWPORT_HEIGHT = 2400
 
 # Scrolling config
-SCROLL_COUNT = 30
-SCROLL_DELAY_MS = 300
+SCROLL_COUNT = 8
+SCROLL_DELAY_MS = 20
 
 
 def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | None:
@@ -76,7 +79,7 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
 
             # Navigate to the videos page
             logger.info(f"Navigating to: {videos_url}")
-            page.goto(videos_url, wait_until='networkidle', timeout=30000)
+            page.goto(videos_url, wait_until='networkidle', timeout=25000)
 
             # Dismiss cookie/consent banners if present
             try:
@@ -95,7 +98,7 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
             channel_name = _extract_channel_name(page, channel_url)
 
             # Scroll down to load more video thumbnails
-            for i in range(SCROLL_COUNT):
+            for _ in range(SCROLL_COUNT):
                 page.evaluate('window.scrollBy(0, window.innerHeight)')
                 page.wait_for_timeout(SCROLL_DELAY_MS)
 
@@ -106,11 +109,11 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
             # Capture screenshot
             page.screenshot(
                 path=output_path,
-                full_page=False,  # Capture only the viewport (1920x2800)
+                full_page=False,
                 type='png',
             )
 
-            logger.info(f"Screenshot saved: {output_path} (channel: {channel_name})")
+            logger.info(f"Screenshot saved (channel: {channel_name})")
 
             context.close()
             browser.close()
@@ -124,7 +127,7 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
         logger.error(f"Timeout loading channel: {channel_url}")
         return None
     except Exception as e:
-        logger.error(f"Error capturing {channel_url}: {str(e)}")
+        logger.error(f"Error capturing channel: {type(e).__name__}")
         return None
 
 
@@ -135,11 +138,11 @@ def _extract_channel_name(page, channel_url: str) -> str:
     """
     # Try common YouTube selectors for the channel name
     selectors = [
-        'yt-formatted-string.ytd-channel-name',       # modern layout
-        '#channel-name yt-formatted-string',           # alternate
-        '#text.ytd-channel-name',                      # another variant
-        'ytd-channel-name #text',                      # yet another
-        '#channel-header ytd-channel-name',            # header area
+        'yt-formatted-string.ytd-channel-name',
+        '#channel-name yt-formatted-string',
+        '#text.ytd-channel-name',
+        'ytd-channel-name #text',
+        '#channel-header ytd-channel-name',
     ]
 
     for selector in selectors:
@@ -167,12 +170,10 @@ def _extract_channel_name(page, channel_url: str) -> str:
 def _handle_from_url(url: str) -> str:
     """Extract a readable name from a YouTube channel URL."""
     import re
-    # Try to get @handle
     match = re.search(r'@([\w.-]+)', url)
     if match:
         return f"@{match.group(1)}"
 
-    # Try /c/name or /user/name
     match = re.search(r'/(c|user|channel)/([\w.-]+)', url)
     if match:
         return match.group(2)

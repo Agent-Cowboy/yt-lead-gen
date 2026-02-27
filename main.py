@@ -2,9 +2,8 @@
 main.py — FastAPI application with all API endpoints, security middleware,
 rate limiting, GZip compression, and static file serving for the YT Lead Gen app.
 
-Supports two modes:
-  - With Redis + Celery: jobs are queued and processed by the background worker
-  - Without Redis (local dev): jobs are processed synchronously in-process
+Jobs always run in background threads. Redis is used for job status tracking
+only (optional — falls back to in-memory if not available).
 """
 
 import os
@@ -37,7 +36,7 @@ logging.basicConfig(level=logging.INFO)
 # ──────────────────────────────────────────────
 # Configuration
 # ──────────────────────────────────────────────
-REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+REDIS_URL = os.getenv('REDIS_URL', '')
 ALLOWED_ORIGIN = os.getenv('ALLOWED_ORIGIN', 'http://localhost:8000')
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
@@ -53,31 +52,27 @@ UUID_REGEX = re.compile(
 # Redis connection (optional — fallback to in-memory)
 # ──────────────────────────────────────────────
 redis_client = None
-celery_available = False
 
 # In-memory job store (fallback when Redis is not available)
 memory_jobs: dict = {}
 
-try:
-    import redis as redis_lib
-    _test_client = redis_lib.from_url(
-        REDIS_URL,
-        decode_responses=True,
-        socket_connect_timeout=2,
-        ssl_cert_reqs=ssl.CERT_NONE
-    )
-    _test_client.ping()
-    redis_client = _test_client
-    logger.info("Redis connected successfully")
-
-    from worker import process_job
-    celery_available = True
-    logger.info("Celery worker available — jobs will be queued")
-except Exception as e:
-    logger.warning(
-        f"Redis not available ({e}). Running in local mode — "
-        "jobs will process synchronously."
-    )
+if REDIS_URL:
+    try:
+        import redis as redis_lib
+        connect_kwargs = {
+            'decode_responses': True,
+            'socket_connect_timeout': 2,
+        }
+        if REDIS_URL.startswith('rediss://'):
+            connect_kwargs['ssl_cert_reqs'] = ssl.CERT_NONE
+        _test_client = redis_lib.from_url(REDIS_URL, **connect_kwargs)
+        _test_client.ping()
+        redis_client = _test_client
+        logger.info("Redis connected — using for job status tracking")
+    except Exception as e:
+        logger.warning(f"Redis not available ({type(e).__name__}). Using in-memory store.")
+else:
+    logger.info("No REDIS_URL set. Using in-memory job store.")
 
 
 def _validate_uuid(job_id: str) -> None:
@@ -113,84 +108,18 @@ def _serve_static_page(filename: str) -> HTMLResponse:
 
 
 # ──────────────────────────────────────────────
-# Synchronous processing (fallback when no Celery)
+# Background job runner (replaces Celery)
 # ──────────────────────────────────────────────
-def process_job_sync(job_id: str, channels: list[str]):
-    """Process a job synchronously in a background thread."""
-    import shutil
-    from screenshot_capture import capture_channel_screenshot
-    from pdf_generator import generate_pdf
-
-    total = len(channels)
-    job_screenshots_dir = os.path.join(SCREENSHOTS_DIR, job_id)
-    os.makedirs(job_screenshots_dir, exist_ok=True)
-    os.makedirs(PDF_DIR, exist_ok=True)
-
-    set_job(job_id, {
-        'status': 'processing', 'progress': '0', 'total': str(total),
-        'download_url': '', 'error': '',
-    })
-
-    pdf_entries = []
-
-    try:
-        for i, channel_url in enumerate(channels):
-            logger.info(f"[{job_id}] Processing channel {i + 1}/{total}")
-            set_job(job_id, {
-                'status': 'processing', 'progress': str(i), 'total': str(total),
-                'download_url': '', 'error': '',
-            })
-
-            screenshot_path = os.path.join(
-                job_screenshots_dir, f"channel_{i + 1:03d}.png"
-            )
-            result = capture_channel_screenshot(channel_url, screenshot_path)
-
-            if result:
-                pdf_entries.append(result)
-                logger.info(
-                    f"[{job_id}] Channel {i + 1}/{total} captured: "
-                    f"{result['channel_name']}"
-                )
-            else:
-                logger.warning(
-                    f"[{job_id}] Channel {i + 1}/{total} failed — skipping"
-                )
-
-        if not pdf_entries:
-            set_job(job_id, {
-                'status': 'failed', 'progress': str(total), 'total': str(total),
-                'download_url': '',
-                'error': 'Failed to capture any screenshots. Check the URLs.',
-            })
-            return
-
-        set_job(job_id, {
-            'status': 'generating_pdf', 'progress': str(total),
-            'total': str(total), 'download_url': '', 'error': '',
-        })
-
-        pdf_path = os.path.join(PDF_DIR, f"{job_id}.pdf")
-        generate_pdf(pdf_entries, pdf_path)
-
-        set_job(job_id, {
-            'status': 'complete', 'progress': str(total), 'total': str(total),
-            'download_url': f"/api/download/{job_id}", 'error': '',
-        })
-        logger.info(f"[{job_id}] Job complete!")
-
-    except Exception as e:
-        logger.error(f"[{job_id}] Job failed: {type(e).__name__}")
-        set_job(job_id, {
-            'status': 'failed', 'progress': '0', 'total': str(total),
-            'download_url': '', 'error': 'Processing error. Please try again.',
-        })
-    finally:
-        try:
-            if os.path.exists(job_screenshots_dir):
-                shutil.rmtree(job_screenshots_dir)
-        except Exception:
-            pass
+def _run_job_in_thread(job_id: str, channels: list[str]):
+    """Start a job in a background thread."""
+    from worker import process_job
+    thread = threading.Thread(
+        target=process_job,
+        args=(job_id, channels, set_job),
+        daemon=True,
+    )
+    thread.start()
+    logger.info(f"Job {job_id} started ({len(channels)} channels)")
 
 
 # ──────────────────────────────────────────────
@@ -313,6 +242,14 @@ app.add_middleware(
 # ──────────────────────────────────────────────
 @app.middleware("http")
 async def add_security_and_cache_headers(request: Request, call_next):
+    # Block requests with empty or missing User-Agent
+    user_agent = request.headers.get("user-agent", "").strip()
+    if not user_agent and request.url.path.startswith("/api/"):
+        return JSONResponse(
+            status_code=403,
+            content={"detail": "Forbidden"}
+        )
+
     response = await call_next(request)
 
     # Security headers
@@ -346,8 +283,12 @@ async def add_security_and_cache_headers(request: Request, call_next):
     if "server" in response.headers:
         del response.headers["server"]
 
-    # Cache control for static assets
+    # X-Robots-Tag on API routes only
     path = request.url.path
+    if path.startswith("/api/") or path == "/health":
+        response.headers["X-Robots-Tag"] = "noindex"
+
+    # Cache control for static assets vs pages vs API
     if path.startswith("/static/") or path.endswith((".css", ".js", ".woff2")):
         response.headers["Cache-Control"] = "public, max-age=86400, immutable"
     elif path in ("/", "/privacy", "/terms"):
@@ -470,19 +411,7 @@ async def generate_report(request: Request):
         'error': '',
     })
 
-    if celery_available:
-        process_job.delay(job_id, channels)
-        logger.info(f"Job {job_id} queued via Celery ({len(channels)} channels)")
-    else:
-        thread = threading.Thread(
-            target=process_job_sync,
-            args=(job_id, channels),
-            daemon=True,
-        )
-        thread.start()
-        logger.info(
-            f"Job {job_id} started via thread ({len(channels)} channels)"
-        )
+    _run_job_in_thread(job_id, channels)
 
     return JSONResponse({
         "job_id": job_id,
@@ -554,17 +483,13 @@ async def download_pdf(job_id: str, background_tasks: BackgroundTasks):
 
 
 # ──────────────────────────────────────────────
-# Health Check
+# Health Check (minimal — no internal details)
 # ──────────────────────────────────────────────
 
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "mode": "celery" if celery_available else "local",
-        "redis": "connected" if redis_client else "not available",
-    }
+    return {"status": "ok"}
 
 
 # ──────────────────────────────────────────────

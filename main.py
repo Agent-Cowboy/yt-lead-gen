@@ -26,7 +26,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from dotenv import load_dotenv
 
-from url_extractor import extract_channels, MAX_CHANNELS
+from url_extractor import extract_channels
 
 load_dotenv()
 
@@ -36,8 +36,10 @@ logging.basicConfig(level=logging.INFO)
 # ──────────────────────────────────────────────
 # Configuration
 # ──────────────────────────────────────────────
-REDIS_URL = os.getenv('REDIS_URL', '')
-ALLOWED_ORIGIN = os.getenv('ALLOWED_ORIGIN', 'http://localhost:8000')
+REDIS_URL = os.getenv('REDIS_URL', 'rediss://default:Ae8DAAIncDE5OGEzMjFlMTJlMjQ0YzZhYWNhMDJmZmYyNmMxMmQ2N3AxNjExODc@valued-pony-61187.upstash.io:6379')
+ALLOWED_ORIGIN = os.getenv('ALLOWED_ORIGIN', 'https://yt-lead-gen.onrender.com')
+SECRET_KEY = os.getenv('SECRET_KEY', 'fc43069207216c28ac157f35da38467d')
+MAX_CHANNELS = int(os.getenv('MAX_CHANNELS', '30'))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 PDF_DIR = os.path.join(BASE_DIR, 'pdfs')

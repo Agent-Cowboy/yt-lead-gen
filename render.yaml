@@ -6,7 +6,7 @@ services:
     plan: free
     buildCommand: |
       pip install -r requirements.txt &&
-      playwright install --with-deps chromium
+      PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/src/.browsers playwright install --with-deps chromium
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: REDIS_URL
@@ -17,3 +17,5 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.11.7
+      - key: PLAYWRIGHT_BROWSERS_PATH
+        value: /opt/render/project/src/.browsers

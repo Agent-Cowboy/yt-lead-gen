@@ -558,7 +558,7 @@ async def health_debug():
         if test_result.returncode == 0 and 'OK' in test_result.stdout:
             playwright_ok = True
         else:
-            playwright_error = test_result.stderr[:500]
+            playwright_error = test_result.stderr[:2000]
     except Exception as e:
         playwright_error = f"{type(e).__name__}: {e}"
 

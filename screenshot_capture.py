@@ -1,10 +1,6 @@
 """
-screenshot_capture.py — Playwright browser automation.
-Launches headless Chromium, navigates to a YouTube channel's /videos page,
-scrolls to load content, captures a screenshot, and extracts the channel name.
-
-IMPORTANT: Uses subprocess to avoid the "Playwright Sync API inside asyncio loop"
-error that occurs when running from FastAPI's threaded background tasks.
+screenshot_capture.py — Playwright browser automation wrapper.
+Runs Playwright in a subprocess to avoid asyncio loop conflicts with FastAPI.
 """
 
 import os
@@ -22,11 +18,6 @@ CAPTURE_TIMEOUT_SECONDS = 60
 def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | None:
     """
     Capture a screenshot by running the Playwright logic in a subprocess.
-    This avoids the "Sync API inside asyncio loop" error.
-
-    Args:
-        channel_url: Full YouTube channel URL
-        output_path: File path to save the screenshot PNG
 
     Returns:
         Dict with 'path' and 'channel_name' on success, None on failure
@@ -39,6 +30,10 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
     )
 
     try:
+        logger.info(f"Starting capture subprocess: {channel_url}")
+        logger.info(f"Worker script: {worker_script} (exists={os.path.exists(worker_script)})")
+        logger.info(f"Python: {sys.executable}")
+
         result = subprocess.run(
             [sys.executable, worker_script, channel_url, output_path],
             capture_output=True,
@@ -46,20 +41,29 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
             timeout=CAPTURE_TIMEOUT_SECONDS,
         )
 
+        # Log ALL output for debugging
+        if result.stdout:
+            logger.info(f"Subprocess stdout: {result.stdout[:500]}")
+        if result.stderr:
+            logger.info(f"Subprocess stderr: {result.stderr[:500]}")
+
         if result.returncode == 0:
             try:
                 data = json.loads(result.stdout.strip())
                 return data
             except (json.JSONDecodeError, ValueError):
-                logger.error(f"Invalid JSON output from capture subprocess: {result.stdout[:200]}")
+                logger.error(f"Invalid JSON from subprocess: {result.stdout[:200]}")
                 return None
         else:
-            logger.error(f"Capture subprocess failed (exit {result.returncode}): {result.stderr[:300]}")
+            logger.error(
+                f"Capture failed (exit {result.returncode}). "
+                f"stderr: {result.stderr[:500]}"
+            )
             return None
 
     except subprocess.TimeoutExpired:
-        logger.error(f"Capture subprocess timed out ({CAPTURE_TIMEOUT_SECONDS}s): {channel_url}")
+        logger.error(f"Capture timed out ({CAPTURE_TIMEOUT_SECONDS}s): {channel_url}")
         return None
     except Exception as e:
-        logger.error(f"Error running capture subprocess: {type(e).__name__}: {e}")
+        logger.error(f"Subprocess error: {type(e).__name__}: {e}")
         return None

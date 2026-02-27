@@ -537,33 +537,42 @@ async def health_debug():
     """Debug endpoint — shows server info for troubleshooting."""
     import sys
     import shutil
+    import subprocess as sp
 
-    # Check if Playwright browser is available
+    # Test Playwright via subprocess (same as production flow)
     playwright_ok = False
     playwright_error = ""
+    worker_script = os.path.join(BASE_DIR, 'screenshot_worker.py')
+    worker_exists = os.path.exists(worker_script)
+
     try:
-        from playwright.sync_api import sync_playwright
-        with sync_playwright() as p:
-            browser = p.chromium.launch(
-                headless=True,
-                args=['--no-sandbox', '--disable-setuid-sandbox',
-                      '--disable-dev-shm-usage', '--single-process',
-                      '--no-zygote'],
-            )
-            browser.close()
+        test_result = sp.run(
+            [sys.executable, '-c',
+             'from playwright.sync_api import sync_playwright; '
+             'p = sync_playwright().start(); '
+             'b = p.chromium.launch(headless=True, args=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage","--single-process","--no-zygote"]); '
+             'b.close(); p.stop(); '
+             'print("OK")'],
+            capture_output=True, text=True, timeout=30,
+        )
+        if test_result.returncode == 0 and 'OK' in test_result.stdout:
             playwright_ok = True
+        else:
+            playwright_error = test_result.stderr[:500]
     except Exception as e:
         playwright_error = f"{type(e).__name__}: {e}"
 
     return JSONResponse({
         "status": "ok",
-        "python": sys.version,
+        "python": sys.executable,
+        "python_version": sys.version.split()[0],
         "redis_connected": redis_client is not None,
         "redis_url_set": bool(REDIS_URL),
         "allowed_origin": ALLOWED_ORIGIN,
         "secret_key_set": bool(SECRET_KEY),
         "playwright_ok": playwright_ok,
         "playwright_error": playwright_error,
+        "worker_script_exists": worker_exists,
         "memory_jobs_count": len(memory_jobs),
         "pdf_dir_exists": os.path.exists(PDF_DIR),
         "disk_free_mb": round(shutil.disk_usage('/').free / 1024 / 1024),

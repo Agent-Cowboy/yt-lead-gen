@@ -532,6 +532,44 @@ async def health_check():
     return {"status": "ok"}
 
 
+@app.get("/health/debug")
+async def health_debug():
+    """Debug endpoint — shows server info for troubleshooting."""
+    import sys
+    import shutil
+
+    # Check if Playwright browser is available
+    playwright_ok = False
+    playwright_error = ""
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=True,
+                args=['--no-sandbox', '--disable-setuid-sandbox',
+                      '--disable-dev-shm-usage', '--single-process',
+                      '--no-zygote'],
+            )
+            browser.close()
+            playwright_ok = True
+    except Exception as e:
+        playwright_error = f"{type(e).__name__}: {e}"
+
+    return JSONResponse({
+        "status": "ok",
+        "python": sys.version,
+        "redis_connected": redis_client is not None,
+        "redis_url_set": bool(REDIS_URL),
+        "allowed_origin": ALLOWED_ORIGIN,
+        "secret_key_set": bool(SECRET_KEY),
+        "playwright_ok": playwright_ok,
+        "playwright_error": playwright_error,
+        "memory_jobs_count": len(memory_jobs),
+        "pdf_dir_exists": os.path.exists(PDF_DIR),
+        "disk_free_mb": round(shutil.disk_usage('/').free / 1024 / 1024),
+    })
+
+
 # ──────────────────────────────────────────────
 # Static files & 404 fallback (must be last)
 # ──────────────────────────────────────────────

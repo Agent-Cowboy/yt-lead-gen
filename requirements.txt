@@ -1,6 +1,5 @@
 fastapi==0.109.2
 uvicorn[standard]==0.27.1
-celery[redis]==5.3.6
 playwright==1.41.2
 fpdf2==2.7.8
 Pillow==10.4.0

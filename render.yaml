@@ -17,22 +17,3 @@ services:
         generateValue: true
       - key: PYTHON_VERSION
         value: 3.11.7
-
-  # Celery Background Worker
-  - type: worker
-    name: yt-lead-gen-worker
-    runtime: python
-    plan: free
-    buildCommand: |
-      pip install -r requirements.txt &&
-      playwright install chromium
-    startCommand: celery -A worker.celery_app worker --loglevel=info --concurrency=1
-    envVars:
-      - key: REDIS_URL
-        sync: false
-      - key: ALLOWED_ORIGIN
-        sync: false
-      - key: SECRET_KEY
-        generateValue: true
-      - key: PYTHON_VERSION
-        value: 3.11.7

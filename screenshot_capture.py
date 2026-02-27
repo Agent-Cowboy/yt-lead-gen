@@ -28,6 +28,7 @@ BROWSER_ARGS = [
     '--disable-background-timer-throttling',
     '--disable-backgrounding-occluded-windows',
     '--disable-renderer-backgrounding',
+    '--memory-pressure-off',
 ]
 
 # Screenshot dimensions

@@ -7,6 +7,9 @@ only (optional — falls back to in-memory if not available).
 """
 
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import re
 import ssl
 import uuid
@@ -24,11 +27,9 @@ from fastapi.middleware.gzip import GZipMiddleware
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from dotenv import load_dotenv
+import redis as redis_lib
 
 from url_extractor import extract_channels
-
-load_dotenv()
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -36,10 +37,10 @@ logging.basicConfig(level=logging.INFO)
 # ──────────────────────────────────────────────
 # Configuration
 # ──────────────────────────────────────────────
-REDIS_URL = os.getenv('REDIS_URL', 'rediss://default:Ae8DAAIncDE5OGEzMjFlMTJlMjQ0YzZhYWNhMDJmZmYyNmMxMmQ2N3AxNjExODc@valued-pony-61187.upstash.io:6379')
-ALLOWED_ORIGIN = os.getenv('ALLOWED_ORIGIN', 'https://yt-lead-gen.onrender.com')
-SECRET_KEY = os.getenv('SECRET_KEY', 'fc43069207216c28ac157f35da38467d')
-MAX_CHANNELS = int(os.getenv('MAX_CHANNELS', '30'))
+REDIS_URL = os.environ.get('REDIS_URL', '')
+ALLOWED_ORIGIN = os.environ.get('ALLOWED_ORIGIN', '')
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
+MAX_CHANNELS = int(os.environ.get('MAX_CHANNELS', '30'))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 PDF_DIR = os.path.join(BASE_DIR, 'pdfs')
@@ -51,6 +52,33 @@ UUID_REGEX = re.compile(
 )
 
 # ──────────────────────────────────────────────
+# Startup check — SECRET_KEY must be set
+# ──────────────────────────────────────────────
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable is not set!")
+
+
+# ──────────────────────────────────────────────
+# Redis connection helper
+# ──────────────────────────────────────────────
+def create_redis_client(url):
+    """Create a Redis client with proper SSL handling for Upstash."""
+    if url.startswith('rediss://'):
+        return redis_lib.from_url(
+            url,
+            decode_responses=True,
+            socket_connect_timeout=3,
+            ssl_cert_reqs=ssl.CERT_NONE
+        )
+    else:
+        return redis_lib.from_url(
+            url,
+            decode_responses=True,
+            socket_connect_timeout=3
+        )
+
+
+# ──────────────────────────────────────────────
 # Redis connection (optional — fallback to in-memory)
 # ──────────────────────────────────────────────
 redis_client = None
@@ -60,14 +88,7 @@ memory_jobs: dict = {}
 
 if REDIS_URL:
     try:
-        import redis as redis_lib
-        connect_kwargs = {
-            'decode_responses': True,
-            'socket_connect_timeout': 2,
-        }
-        if REDIS_URL.startswith('rediss://'):
-            connect_kwargs['ssl_cert_reqs'] = ssl.CERT_NONE
-        _test_client = redis_lib.from_url(REDIS_URL, **connect_kwargs)
+        _test_client = create_redis_client(REDIS_URL)
         _test_client.ping()
         redis_client = _test_client
         logger.info("Redis connected — using for job status tracking")
@@ -110,17 +131,16 @@ def _serve_static_page(filename: str) -> HTMLResponse:
 
 
 # ──────────────────────────────────────────────
-# Background job runner (replaces Celery)
+# Background job runner (threading — no Celery)
 # ──────────────────────────────────────────────
 def _run_job_in_thread(job_id: str, channels: list[str]):
     """Start a job in a background thread."""
-    from worker import process_job
-    thread = threading.Thread(
-        target=process_job,
-        args=(job_id, channels, set_job),
+    from worker import process_job_sync
+    threading.Thread(
+        target=process_job_sync,
+        args=(job_id, channels),
         daemon=True,
-    )
-    thread.start()
+    ).start()
     logger.info(f"Job {job_id} started ({len(channels)} channels)")
 
 
@@ -235,7 +255,7 @@ app.add_middleware(
     allow_origins=[ALLOWED_ORIGIN],
     allow_credentials=False,
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
+    allow_headers=["Content-Type", "X-Secret-Key"],
 )
 
 
@@ -370,7 +390,25 @@ async def generate_report(request: Request):
     """
     Accept a list of YouTube URLs/handles, validate them,
     create a background job, and return the job_id.
+    Protected by SECRET_KEY validation via X-Secret-Key header.
     """
+    # ── SECRET_KEY validation ──
+    # Requests from the app's own frontend (same origin) are trusted via
+    # Origin / Referer check.  External API consumers must supply the key.
+    origin = request.headers.get("origin", "")
+    referer = request.headers.get("referer", "")
+    is_same_origin = (
+        origin == ALLOWED_ORIGIN
+        or referer.startswith(ALLOWED_ORIGIN)
+    )
+    if not is_same_origin:
+        request_key = request.headers.get("X-Secret-Key", "")
+        if not request_key or request_key != SECRET_KEY:
+            raise HTTPException(
+                status_code=403,
+                detail="Forbidden: invalid or missing secret key",
+            )
+
     try:
         body = await request.json()
     except Exception:

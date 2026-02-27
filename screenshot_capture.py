@@ -2,6 +2,8 @@
 screenshot_capture.py — Playwright browser automation.
 Launches headless Chromium, navigates to a YouTube channel's /videos page,
 scrolls to load content, captures a screenshot, and extracts the channel name.
+
+Optimized for Render free tier (512MB RAM).
 """
 
 import os
@@ -29,15 +31,20 @@ BROWSER_ARGS = [
     '--disable-backgrounding-occluded-windows',
     '--disable-renderer-backgrounding',
     '--memory-pressure-off',
+    '--disable-features=TranslateUI',
+    '--disable-ipc-flooding-protection',
 ]
 
-# Screenshot dimensions
-VIEWPORT_WIDTH = 1920
-VIEWPORT_HEIGHT = 2400
+# Screenshot dimensions — reduced for Render free tier (512MB RAM)
+VIEWPORT_WIDTH = 1280
+VIEWPORT_HEIGHT = 900
 
 # Scrolling config
-SCROLL_COUNT = 8
-SCROLL_DELAY_MS = 20
+SCROLL_COUNT = 5
+SCROLL_DELAY_MS = 100
+
+# Hard timeout for entire capture operation (seconds)
+CAPTURE_TIMEOUT_MS = 45000
 
 
 def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | None:
@@ -58,8 +65,10 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
     # Ensure output directory exists
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
+    browser = None
     try:
         with sync_playwright() as p:
+            logger.info(f"Launching browser for: {videos_url}")
             browser = p.chromium.launch(
                 headless=True,
                 args=BROWSER_ARGS,
@@ -76,16 +85,28 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
                 ),
             )
 
+            # Set a hard timeout for ALL operations on this page
+            context.set_default_timeout(15000)
+
             page = context.new_page()
 
-            # Navigate to the videos page
-            # NOTE: 'domcontentloaded' is used instead of 'networkidle' because
-            # YouTube never reaches network-idle (constant analytics/ads traffic).
+            # Block unnecessary resources to save memory and speed up loading
+            page.route("**/*.{png,jpg,jpeg,gif,svg,mp4,webm,woff,woff2,ttf}",
+                       lambda route: route.abort())
+            page.route("**/ads*", lambda route: route.abort())
+            page.route("**/analytics*", lambda route: route.abort())
+            page.route("**/googlesyndication*", lambda route: route.abort())
+            page.route("**/doubleclick*", lambda route: route.abort())
+
+            # Navigate — use 'domcontentloaded' because YouTube NEVER reaches
+            # 'networkidle' (constant analytics/ads/websocket traffic)
             logger.info(f"Navigating to: {videos_url}")
             page.goto(videos_url, wait_until='domcontentloaded', timeout=30000)
 
-            # Wait for page content to render after DOM is ready
-            page.wait_for_timeout(2000)
+            # Unblock images AFTER navigation so the page layout is set,
+            # then wait for video thumbnails to start loading
+            page.unroute_all()
+            page.wait_for_timeout(3000)
 
             # Dismiss cookie/consent banners if present
             try:
@@ -95,8 +116,8 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
                     'button[aria-label="Accept all"]'
                 )
                 if consent_button.count() > 0:
-                    consent_button.first.click(timeout=3000)
-                    page.wait_for_timeout(1000)
+                    consent_button.first.click(timeout=2000)
+                    page.wait_for_timeout(500)
             except Exception:
                 pass  # No consent dialog — continue
 
@@ -123,6 +144,7 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
 
             context.close()
             browser.close()
+            browser = None
 
             return {
                 'path': output_path,
@@ -133,41 +155,48 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
         logger.error(f"Timeout loading channel: {channel_url}")
         return None
     except Exception as e:
-        logger.error(f"Error capturing channel: {type(e).__name__}")
+        logger.error(f"Error capturing channel {channel_url}: {type(e).__name__}: {e}")
         return None
+    finally:
+        # Ensure browser is always closed even on unexpected errors
+        if browser:
+            try:
+                browser.close()
+            except Exception:
+                pass
 
 
 def _extract_channel_name(page, channel_url: str) -> str:
     """
     Try to extract the channel display name from the page.
     Falls back to the @handle from the URL if extraction fails.
+    Uses short timeouts to avoid hanging.
     """
-    # Try common YouTube selectors for the channel name
+    # Try page title first — fastest and most reliable
+    try:
+        title = page.title()
+        if title and ' - YouTube' in title:
+            name = title.replace(' - YouTube', '').strip()
+            if name:
+                return name
+    except Exception:
+        pass
+
+    # Try a couple of common selectors with SHORT timeouts
     selectors = [
-        'yt-formatted-string.ytd-channel-name',
         '#channel-name yt-formatted-string',
-        '#text.ytd-channel-name',
-        'ytd-channel-name #text',
-        '#channel-header ytd-channel-name',
+        'yt-formatted-string.ytd-channel-name',
     ]
 
     for selector in selectors:
         try:
             el = page.locator(selector).first
-            if el.is_visible(timeout=2000):
-                name = el.inner_text(timeout=2000).strip()
-                if name and len(name) > 0:
+            if el.is_visible(timeout=1500):
+                name = el.inner_text(timeout=1500).strip()
+                if name:
                     return name
         except Exception:
             continue
-
-    # Fallback: try page title (usually "ChannelName - YouTube")
-    try:
-        title = page.title()
-        if title and ' - YouTube' in title:
-            return title.replace(' - YouTube', '').strip()
-    except Exception:
-        pass
 
     # Last resort: extract @handle from URL
     return _handle_from_url(channel_url)

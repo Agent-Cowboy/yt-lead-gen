@@ -138,7 +138,7 @@ def _run_job_in_thread(job_id: str, channels: list[str]):
     from worker import process_job_sync
     threading.Thread(
         target=process_job_sync,
-        args=(job_id, channels),
+        args=(job_id, channels, set_job),
         daemon=True,
     ).start()
     logger.info(f"Job {job_id} started ({len(channels)} channels)")

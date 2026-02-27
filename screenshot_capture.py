@@ -33,13 +33,17 @@ def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | Non
     """
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
+    # Path to the standalone Playwright script
+    worker_script = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), 'screenshot_worker.py'
+    )
+
     try:
         result = subprocess.run(
-            [sys.executable, '-m', 'screenshot_worker', channel_url, output_path],
+            [sys.executable, worker_script, channel_url, output_path],
             capture_output=True,
             text=True,
             timeout=CAPTURE_TIMEOUT_SECONDS,
-            cwd=os.path.dirname(os.path.abspath(__file__)),
         )
 
         if result.returncode == 0:

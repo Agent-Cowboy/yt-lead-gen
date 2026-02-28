@@ -7,7 +7,7 @@ services:
     buildCommand: |
       pip install -r requirements.txt &&
       PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/src/.browsers playwright install --with-deps chromium
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: PLAYWRIGHT_BROWSERS_PATH=/opt/render/project/src/.browsers uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: REDIS_URL
         sync: false

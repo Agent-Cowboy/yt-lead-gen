@@ -14,10 +14,10 @@ import json
 import time
 import logging
 
-# Set Playwright browser path BEFORE importing playwright.
-# On Render, the build installs chromium to this path but the env var
-# may not be set in the dashboard, so we set it here as a fallback.
-os.environ.setdefault(
+# Force set Playwright browser path BEFORE importing playwright.
+# On Render, chromium is installed to this dir during build.
+# Must be set before import so Playwright finds the binary.
+os.environ['PLAYWRIGHT_BROWSERS_PATH'] = os.environ.get(
     'PLAYWRIGHT_BROWSERS_PATH',
     '/opt/render/project/src/.browsers'
 )

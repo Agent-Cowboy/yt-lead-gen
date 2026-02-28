@@ -11,6 +11,7 @@ import os
 import re
 import sys
 import json
+import time
 import logging
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
@@ -40,13 +41,13 @@ BROWSER_ARGS = [
     '--disable-ipc-flooding-protection',
 ]
 
-# Screenshot dimensions — sized for Render free tier (512MB RAM)
+# Screenshot dimensions
 VIEWPORT_WIDTH = 1280
-VIEWPORT_HEIGHT = 900
+VIEWPORT_HEIGHT = 3000
 
 # Scrolling config
-SCROLL_COUNT = 5
-SCROLL_DELAY_MS = 100
+SCROLL_COUNT = 12
+SCROLL_DELAY_MS = 20
 
 
 def capture(channel_url: str, output_path: str) -> dict:
@@ -109,13 +110,12 @@ def capture(channel_url: str, output_path: str) -> dict:
 
             # Scroll back to top for the final screenshot
             page.evaluate('window.scrollTo(0, 0)')
-            page.wait_for_timeout(500)
+            time.sleep(1.2)
 
-            # Capture screenshot
+            # Capture screenshot with clip for better video visibility
             page.screenshot(
                 path=output_path,
-                full_page=False,
-                type='png',
+                clip={'x': 0, 'y': 0, 'width': 1280, 'height': 2800},
             )
 
             logger.info(f"Screenshot saved (channel: {channel_name})")

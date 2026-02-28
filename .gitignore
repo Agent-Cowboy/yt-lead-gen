@@ -39,3 +39,6 @@ desktop.ini
 
 # Logs
 *.log
+
+# Debug / temp JSON
+*.json

@@ -41,9 +41,9 @@ BROWSER_ARGS = [
     '--disable-ipc-flooding-protection',
 ]
 
-# Screenshot dimensions
+# Screenshot dimensions — balanced for Render 512MB + good video visibility
 VIEWPORT_WIDTH = 1280
-VIEWPORT_HEIGHT = 3000
+VIEWPORT_HEIGHT = 2000
 
 # Scrolling config
 SCROLL_COUNT = 12
@@ -85,7 +85,7 @@ def capture(channel_url: str, output_path: str) -> dict:
             page.goto(videos_url, wait_until='domcontentloaded', timeout=30000)
 
             # Wait for page content to render
-            page.wait_for_timeout(3000)
+            page.wait_for_timeout(2000)
 
             # Dismiss cookie/consent banners if present
             try:
@@ -110,12 +110,12 @@ def capture(channel_url: str, output_path: str) -> dict:
 
             # Scroll back to top for the final screenshot
             page.evaluate('window.scrollTo(0, 0)')
-            time.sleep(1.2)
+            time.sleep(0.8)
 
             # Capture screenshot with clip for better video visibility
             page.screenshot(
                 path=output_path,
-                clip={'x': 0, 'y': 0, 'width': 1280, 'height': 2800},
+                clip={'x': 0, 'y': 0, 'width': 1280, 'height': 1800},
             )
 
             logger.info(f"Screenshot saved (channel: {channel_name})")

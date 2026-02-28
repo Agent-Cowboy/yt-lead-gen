@@ -13,6 +13,15 @@ import sys
 import json
 import time
 import logging
+
+# Set Playwright browser path BEFORE importing playwright.
+# On Render, the build installs chromium to this path but the env var
+# may not be set in the dashboard, so we set it here as a fallback.
+os.environ.setdefault(
+    'PLAYWRIGHT_BROWSERS_PATH',
+    '/opt/render/project/src/.browsers'
+)
+
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
 logging.basicConfig(level=logging.INFO, stream=sys.stderr)

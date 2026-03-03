@@ -48,6 +48,9 @@ BROWSER_ARGS = [
     '--memory-pressure-off',
     '--disable-features=TranslateUI',
     '--disable-ipc-flooding-protection',
+    '--disable-web-security',
+    '--disable-features=VizDisplayCompositor',
+    '--aggressive-cache-discard',
 ]
 
 # Screenshot dimensions — balanced for Render 512MB + good video visibility
@@ -55,8 +58,8 @@ VIEWPORT_WIDTH = 1280
 VIEWPORT_HEIGHT = 2000
 
 # Scrolling config
-SCROLL_COUNT = 12
-SCROLL_DELAY_MS = 20
+SCROLL_COUNT = 6
+SCROLL_DELAY_MS = 30
 
 
 def capture(channel_url: str, output_path: str) -> dict:
@@ -88,13 +91,12 @@ def capture(channel_url: str, output_path: str) -> dict:
 
             page = context.new_page()
 
-            # Navigate — use 'domcontentloaded' because YouTube NEVER reaches
-            # 'networkidle' (constant analytics/ads/websocket traffic)
+            # Navigate — use 'networkidle' for more reliable YouTube loading
             logger.info(f"Navigating to: {videos_url}")
-            page.goto(videos_url, wait_until='domcontentloaded', timeout=30000)
+            page.goto(videos_url, wait_until='networkidle', timeout=30000)
 
-            # Wait for page content to render
-            page.wait_for_timeout(2000)
+            # Wait for YouTube video grid to fully render
+            page.wait_for_selector('ytd-rich-grid-renderer', timeout=20000)
 
             # Dismiss cookie/consent banners if present
             try:

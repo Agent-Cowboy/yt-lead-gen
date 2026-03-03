@@ -12,7 +12,7 @@ import subprocess
 logger = logging.getLogger(__name__)
 
 # Hard timeout for the entire capture subprocess (seconds)
-CAPTURE_TIMEOUT_SECONDS = 60
+CAPTURE_TIMEOUT_SECONDS = 120
 
 
 def capture_channel_screenshot(channel_url: str, output_path: str) -> dict | None:

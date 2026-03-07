@@ -589,6 +589,131 @@
           height: 100px;
         }
       }
+
+      /* ═══════════════════════════════════════════
+         MINI GAME — TRIVIA + CLICKER
+         ═══════════════════════════════════════════ */
+      .mini-game-area {
+        margin-top: 28px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+        animation: fadeInUp 0.5s ease forwards;
+      }
+
+      /* Trivia Card */
+      .trivia-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px 24px;
+        position: relative;
+        overflow: hidden;
+        min-height: 100px;
+      }
+      .trivia-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: 'Inter', sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 10px;
+      }
+      .trivia-label svg {
+        width: 14px;
+        height: 14px;
+      }
+      .trivia-text {
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+      .trivia-text.fade-out {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      .trivia-text.fade-in {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .trivia-progress-dots {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        margin-top: 14px;
+      }
+      .trivia-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--border-color);
+        transition: background 0.3s ease;
+      }
+      .trivia-dot.active {
+        background: var(--accent);
+      }
+
+      /* Click Game */
+      .click-game {
+        margin-top: 20px;
+        text-align: center;
+      }
+      .click-play-btn {
+        width: 72px;
+        height: 72px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.15s ease, box-shadow 0.3s ease;
+        animation: clickPulse 2.5s ease-in-out infinite;
+        box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.15);
+      }
+      .click-play-btn:hover {
+        transform: scale(1.08);
+      }
+      .click-play-btn:active {
+        transform: scale(0.92);
+        animation: none;
+      }
+      .click-play-btn svg {
+        width: 28px;
+        height: 28px;
+        fill: white;
+        margin-left: 3px;
+      }
+      @keyframes clickPulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.2); }
+        50% { box-shadow: 0 0 0 12px rgba(229, 57, 53, 0); }
+      }
+      .click-count {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-top: 10px;
+        transition: transform 0.15s ease;
+      }
+      .click-count.pop {
+        transform: scale(1.2);
+      }
+      .click-message {
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--accent);
+        margin-top: 4px;
+        min-height: 20px;
+        transition: opacity 0.3s ease;
+      }
     </style>
   </head>
   <body>
@@ -750,6 +875,34 @@
             <p id="progress-percent" class="font-body text-xs text-center mt-3" style="color: var(--text-secondary);">
               0%
             </p>
+
+            <!-- ─── MINI GAME AREA ─── -->
+            <div class="mini-game-area">
+              <!-- Trivia Card -->
+              <div class="trivia-card">
+                <div class="trivia-label">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 18h6"/>
+                    <path d="M10 22h4"/>
+                    <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>
+                  </svg>
+                  DID YOU KNOW?
+                </div>
+                <p id="trivia-text" class="trivia-text fade-in"></p>
+                <div id="trivia-dots" class="trivia-progress-dots"></div>
+              </div>
+
+              <!-- Click Game -->
+              <div class="click-game">
+                <p class="font-body text-xs mb-3" style="color: var(--text-muted);">Click to pass the time!</p>
+                <button id="click-play-btn" class="click-play-btn" type="button">
+                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <div id="click-count" class="click-count">0</div>
+                <div id="click-message" class="click-message">&nbsp;</div>
+              </div>
+            </div>
+
           </div>
 
           <!-- ─── DOWNLOAD SECTION ─── -->
@@ -1051,6 +1204,126 @@
         textareaWrapper.classList.remove("active");
         showSection(inputSection);
       }
+
+      // ═══════════════════════════════════════════
+      // MINI GAME — Trivia + Clicker
+      // ═══════════════════════════════════════════
+
+      const ytFacts = [
+        '"Me at the zoo" was the first YouTube video ever uploaded — April 23, 2005.',
+        'MrBeast has spent over $3.5 million on a single video.',
+        'PewDiePie held the #1 most-subscribed spot for 6 years straight.',
+        'YouTube has over 2.7 billion logged-in users every month.',
+        'Over 1 billion hours of YouTube are watched every single day.',
+        'The most liked YouTube video has over 24 million likes.',
+        'YouTube is the second most visited website in the world.',
+        '500+ hours of video are uploaded to YouTube every minute.',
+        'YouTube is available in over 100 countries and 80 languages.',
+        'The YouTube app was the most downloaded app of 2023.',
+      ];
+
+      const clickMessages = [
+        'Keep going! 🔥',
+        "You're on fire! 💪",
+        'Almost there! 🚀',
+        'Unstoppable! ⚡',
+        'Legend status! 🏆',
+        'Click machine! 🎯',
+        'Mega clicker! 🌟',
+        'Insane! 🤯',
+      ];
+
+      let triviaIndex = 0;
+      let triviaTimer = null;
+      let clickCount = 0;
+
+      function startTrivia() {
+        triviaIndex = Math.floor(Math.random() * ytFacts.length);
+        clickCount = 0;
+
+        const triviaTextEl = document.getElementById('trivia-text');
+        const triviaDotsEl = document.getElementById('trivia-dots');
+        const clickCountEl = document.getElementById('click-count');
+        const clickMsgEl = document.getElementById('click-message');
+
+        if (!triviaTextEl) return;
+
+        // Set initial fact
+        triviaTextEl.textContent = ytFacts[triviaIndex];
+        triviaTextEl.classList.remove('fade-out');
+        triviaTextEl.classList.add('fade-in');
+
+        // Build dots
+        triviaDotsEl.innerHTML = '';
+        for (let i = 0; i < ytFacts.length; i++) {
+          const dot = document.createElement('span');
+          dot.className = 'trivia-dot' + (i === triviaIndex ? ' active' : '');
+          triviaDotsEl.appendChild(dot);
+        }
+
+        // Reset click game
+        clickCountEl.textContent = '0';
+        clickMsgEl.innerHTML = '&nbsp;';
+
+        // Start rotation
+        if (triviaTimer) clearInterval(triviaTimer);
+        triviaTimer = setInterval(rotateTrivia, 8000);
+      }
+
+      function rotateTrivia() {
+        const triviaTextEl = document.getElementById('trivia-text');
+        const triviaDotsEl = document.getElementById('trivia-dots');
+        if (!triviaTextEl) return;
+
+        // Fade out
+        triviaTextEl.classList.remove('fade-in');
+        triviaTextEl.classList.add('fade-out');
+
+        setTimeout(() => {
+          triviaIndex = (triviaIndex + 1) % ytFacts.length;
+          triviaTextEl.textContent = ytFacts[triviaIndex];
+          triviaTextEl.classList.remove('fade-out');
+          triviaTextEl.classList.add('fade-in');
+
+          // Update dots
+          const dots = triviaDotsEl.querySelectorAll('.trivia-dot');
+          dots.forEach((d, i) => d.classList.toggle('active', i === triviaIndex));
+        }, 400);
+      }
+
+      function stopTrivia() {
+        if (triviaTimer) {
+          clearInterval(triviaTimer);
+          triviaTimer = null;
+        }
+      }
+
+      // Click game handler
+      document.getElementById('click-play-btn').addEventListener('click', () => {
+        clickCount++;
+        const clickCountEl = document.getElementById('click-count');
+        const clickMsgEl = document.getElementById('click-message');
+
+        clickCountEl.textContent = clickCount;
+        clickCountEl.classList.add('pop');
+        setTimeout(() => clickCountEl.classList.remove('pop'), 150);
+
+        if (clickCount % 10 === 0) {
+          const msgIdx = Math.min(Math.floor(clickCount / 10) - 1, clickMessages.length - 1);
+          clickMsgEl.textContent = clickMessages[msgIdx];
+        }
+      });
+
+      // Hook into showSection to start/stop trivia
+      const _originalShowSection = showSection;
+      showSection = function(section) {
+        _originalShowSection(section);
+        if (section === progressSection) {
+          startTrivia();
+        } else {
+          stopTrivia();
+        }
+      };
     </script>
   </body>
 </html>

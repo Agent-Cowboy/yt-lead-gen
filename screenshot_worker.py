@@ -91,12 +91,19 @@ def capture(channel_url: str, output_path: str) -> dict:
 
             page = context.new_page()
 
-            # Navigate — use 'networkidle' for more reliable YouTube loading
+            # Navigate — use 'domcontentloaded' because YouTube NEVER reaches
+            # 'networkidle' (constant analytics/ads/websocket traffic)
             logger.info(f"Navigating to: {videos_url}")
-            page.goto(videos_url, wait_until='networkidle', timeout=30000)
+            page.goto(videos_url, wait_until='domcontentloaded', timeout=30000)
 
-            # Wait for YouTube video grid to fully render
-            page.wait_for_selector('ytd-rich-grid-renderer', timeout=20000)
+            # Give YouTube's JS time to mount the video grid
+            page.wait_for_timeout(3000)
+
+            # Wait for YouTube video grid to render (non-fatal if missing)
+            try:
+                page.wait_for_selector('ytd-rich-grid-renderer', timeout=20000)
+            except PlaywrightTimeout:
+                logger.warning("ytd-rich-grid-renderer not found — continuing anyway")
 
             # Dismiss cookie/consent banners if present
             try:

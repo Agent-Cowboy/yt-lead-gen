@@ -50,6 +50,8 @@ MAX_REQUEST_BODY_BYTES = 50_000  # 50 KB max request body
 UUID_REGEX = re.compile(
     r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
 )
+HTML_TAG_RE = re.compile(r'<[^>]+>')
+CONTROL_CHAR_RE = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f]')
 
 # ──────────────────────────────────────────────
 # Startup check — SECRET_KEY must be set
@@ -430,6 +432,16 @@ async def generate_report(request: Request):
             detail="Input text too long. Max 10,000 characters."
         )
 
+    # Reject control characters (potential injection)
+    if CONTROL_CHAR_RE.search(raw_input):
+        raise HTTPException(
+            status_code=400,
+            detail="Input contains invalid characters."
+        )
+
+    # Strip any HTML tags (defense-in-depth against XSS)
+    raw_input = HTML_TAG_RE.sub('', raw_input)
+
     try:
         channels = extract_channels(raw_input)
     except ValueError as e:
@@ -461,7 +473,8 @@ async def generate_report(request: Request):
 
 
 @app.get("/api/status/{job_id}")
-async def get_job_status(job_id: str):
+@limiter.limit("60/minute")
+async def get_job_status(job_id: str, request: Request):
     """Return current job status and progress."""
     _validate_uuid(job_id)
 
@@ -480,7 +493,8 @@ async def get_job_status(job_id: str):
 
 
 @app.get("/api/download/{job_id}")
-async def download_pdf(job_id: str, background_tasks: BackgroundTasks):
+@limiter.limit("10/minute")
+async def download_pdf(job_id: str, request: Request, background_tasks: BackgroundTasks):
     """Serve the generated PDF as a download."""
     _validate_uuid(job_id)
 
@@ -527,87 +541,12 @@ async def download_pdf(job_id: str, background_tasks: BackgroundTasks):
 # ──────────────────────────────────────────────
 
 @app.get("/health")
-async def health_check():
+@limiter.limit("30/minute")
+async def health_check(request: Request):
     """Health check endpoint."""
     return {"status": "ok"}
 
 
-@app.get("/health/debug")
-async def health_debug(request: Request):
-    """Secured debug endpoint — requires SECRET_KEY."""
-    key = request.headers.get("X-Secret-Key", "")
-    if key != SECRET_KEY:
-        raise HTTPException(status_code=403, detail="Forbidden")
-
-    import sys
-    import subprocess as sp
-    import glob
-
-    browsers_path = os.environ.get('PLAYWRIGHT_BROWSERS_PATH', 'NOT SET')
-    browsers_dir = '/opt/render/project/src/.browsers'
-
-    # Check if browser dir exists and list contents
-    dir_exists = os.path.exists(browsers_dir)
-    dir_contents = []
-    chrome_binary = None
-    if dir_exists:
-        try:
-            for root, dirs, files in os.walk(browsers_dir):
-                for f in files:
-                    fp = os.path.join(root, f)
-                    rel = os.path.relpath(fp, browsers_dir)
-                    if 'chrome' in f.lower():
-                        dir_contents.append(f"** {rel}")
-                        if f == 'chrome' or f == 'chromium':
-                            chrome_binary = fp
-                    elif len(dir_contents) < 20:
-                        dir_contents.append(rel)
-        except Exception as e:
-            dir_contents.append(f"ERROR: {e}")
-
-    # Also check default cache path
-    cache_path = os.path.expanduser('~/.cache/ms-playwright')
-    cache_exists = os.path.exists(cache_path)
-    cache_chromes = glob.glob(f'{cache_path}/chromium-*/chrome-linux/chrome')
-
-    # Also check /opt/render/.cache
-    render_cache = '/opt/render/.cache/ms-playwright'
-    render_cache_exists = os.path.exists(render_cache)
-    render_cache_chromes = glob.glob(f'{render_cache}/chromium-*/chrome-linux/chrome')
-
-    # Try subprocess test
-    sub_stdout = ""
-    sub_stderr = ""
-    sub_exit = -1
-    try:
-        test = sp.run(
-            [sys.executable, '-c',
-             'import os; os.environ["PLAYWRIGHT_BROWSERS_PATH"] = "/opt/render/project/src/.browsers"; '
-             'from playwright.sync_api import sync_playwright; '
-             'p = sync_playwright().start(); '
-             'b = p.chromium.launch(headless=True, args=["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage","--single-process","--no-zygote"]); '
-             'b.close(); p.stop(); print("OK")'],
-            capture_output=True, text=True, timeout=30,
-        )
-        sub_stdout = test.stdout[:500]
-        sub_stderr = test.stderr[:1500]
-        sub_exit = test.returncode
-    except Exception as e:
-        sub_stderr = f"{type(e).__name__}: {e}"
-
-    return JSONResponse({
-        "env_browsers_path": browsers_path,
-        "browsers_dir_exists": dir_exists,
-        "browsers_dir_contents": dir_contents[:30],
-        "chrome_binary_found": chrome_binary,
-        "cache_exists": cache_exists,
-        "cache_chromes": cache_chromes[:5],
-        "render_cache_exists": render_cache_exists,
-        "render_cache_chromes": render_cache_chromes[:5],
-        "subprocess_exit": sub_exit,
-        "subprocess_stdout": sub_stdout,
-        "subprocess_stderr": sub_stderr,
-    })
 # ──────────────────────────────────────────────
 # Static files & 404 fallback (must be last)
 # ──────────────────────────────────────────────

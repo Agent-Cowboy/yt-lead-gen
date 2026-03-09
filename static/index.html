@@ -852,46 +852,75 @@
          ═══════════════════════════════════════════ */
       .support-trigger-btn {
         position: fixed;
-        top: 20px;
-        right: 20px;
+        bottom: 32px;
+        right: 32px;
+        top: auto;
         z-index: 1000;
         display: flex;
         align-items: center;
-        gap: 7px;
-        padding: 9px 16px;
-        background: #111114;
-        border: 1px solid #1E1E24;
+        gap: 10px;
+        padding: 14px 22px;
+        background: #E8193C;
+        border: none;
         border-radius: 999px;
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px;
-        color: #E8193C;
+        font-size: 13px;
+        font-weight: 500;
+        color: white;
         cursor: pointer;
-        transition: all 200ms ease;
-        box-shadow: 0 4px 20px #00000060;
+        transition: all 250ms ease;
+        box-shadow: 
+          0 8px 32px #E8193C50,
+          0 2px 8px #00000060;
       }
       .support-trigger-btn:hover {
-        background: #E8193C;
-        color: white;
-        border-color: #E8193C;
-        box-shadow: 0 4px 24px #E8193C40;
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 
+          0 16px 48px #E8193C60,
+          0 4px 16px #00000060;
+        background: #FF1F43;
+      }
+      .support-trigger-btn:active {
+        transform: translateY(-1px) scale(0.99);
+      }
+      .support-trigger-btn::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 999px;
+        border: 2px solid #E8193C;
+        animation: supportRipple 2s ease infinite;
+        opacity: 0;
+        pointer-events: none;
       }
       .support-trigger-btn::after {
         content: '';
         position: absolute;
-        inset: -1px;
+        inset: -4px;
         border-radius: 999px;
-        border: 1px solid #E8193C;
-        animation: triggerPulse 2.5s ease infinite;
+        border: 2px solid #E8193C;
+        animation: supportRipple 2s ease infinite 0.6s;
         opacity: 0;
         pointer-events: none;
       }
-      @keyframes triggerPulse {
-        0%   { transform: scale(1);   opacity: 0.5; }
-        100% { transform: scale(1.2); opacity: 0; }
+      @keyframes supportRipple {
+        0%   { transform: scale(1);    opacity: 0.6; }
+        100% { transform: scale(1.25); opacity: 0; }
       }
-      @media (max-width: 480px) {
+      @media (min-width: 769px) {
+        .support-trigger-btn span { display: inline; }
+      }
+      @media (max-width: 768px) {
+        .support-trigger-btn {
+          bottom: 24px;
+          right: 24px;
+          padding: 14px;
+          border-radius: 50%;
+          width: 52px;
+          height: 52px;
+          justify-content: center;
+        }
         .support-trigger-btn span { display: none; }
-        .support-trigger-btn { padding: 10px 12px; }
       }
 
       /* ═══════════════════════════════════════════
@@ -1128,10 +1157,10 @@
 
     <!-- Support trigger button -->
     <button id="supportTrigger" class="support-trigger-btn" onclick="openSupportModal()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
       </svg>
-      <span>Support</span>
+      <span>Support This Tool</span>
     </button>
 
     <!-- Scroll to top -->

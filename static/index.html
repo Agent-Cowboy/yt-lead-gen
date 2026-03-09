@@ -281,10 +281,13 @@
         z-index: 1;
         font-family: 'Bebas Neue', sans-serif;
         font-weight: 400;
-        font-size: clamp(48px, 6vw, 80px);
+        font-size: clamp(48px, 7vw, 88px);
         line-height: 1.05;
         color: var(--text-primary);
-        letter-spacing: 0.04em;
+        letter-spacing: 0.02em;
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
       }
       .hero-sub {
         font-family: 'DM Sans', sans-serif;
@@ -843,75 +846,145 @@
           padding: 24px 16px;
         }
       }
+      @media (max-width: 480px) {
+        .support-trigger-btn span { display: none; }
+        .support-trigger-btn { padding: 10px 12px; }
+      }
 
       /* ═══════════════════════════════════════════
-         MINI GAME — TRIVIA + CLICKER
+         SUPPORT TRIGGER + MODAL
          ═══════════════════════════════════════════ */
-      .mini-game-area {
-        margin-top: 28px;
-        padding-top: 24px;
-        border-top: 1px solid var(--border);
-        animation: fadeInUp 0.5s ease forwards;
-      }
-      .trivia-card {
-        background: var(--bg-base);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 20px 24px;
-        position: relative;
-        overflow: hidden;
-        min-height: 100px;
-      }
-      .trivia-label {
-        display: inline-flex;
+      .support-trigger-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 7px;
+        padding: 9px 16px;
+        background: #111114;
+        border: 1px solid #1E1E24;
+        border-radius: 999px;
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 11px;
-        font-weight: 500;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        color: var(--accent);
-        margin-bottom: 10px;
+        font-size: 12px;
+        color: #E8193C;
+        cursor: pointer;
+        transition: all 200ms ease;
+        box-shadow: 0 4px 20px #00000060;
       }
-      .trivia-label svg { width: 14px; height: 14px; }
-      .trivia-text {
-        font-family: 'DM Sans', sans-serif;
-        font-size: 15px;
-        line-height: 1.6;
-        color: var(--text-muted);
-        transition: opacity 0.4s ease, transform 0.4s ease;
+      .support-trigger-btn:hover {
+        background: #E8193C;
+        color: white;
+        border-color: #E8193C;
+        box-shadow: 0 4px 24px #E8193C40;
       }
-      .trivia-text.fade-out { opacity: 0; transform: translateY(-6px); }
-      .trivia-text.fade-in { opacity: 1; transform: translateY(0); }
-      .trivia-progress-dots { display: flex; gap: 5px; justify-content: center; margin-top: 14px; }
-      .trivia-dot {
-        width: 5px; height: 5px; border-radius: 50%;
-        background: var(--border); transition: background 0.3s ease;
+      .support-trigger-btn::before {
+        content: '';
+        position: absolute;
+        inset: -1px;
+        border-radius: 999px;
+        border: 1px solid #E8193C;
+        animation: triggerPulse 2.5s ease infinite;
+        opacity: 0;
       }
-      .trivia-dot.active { background: var(--accent); }
+      @keyframes triggerPulse {
+        0%   { transform: scale(1);    opacity: 0.6; }
+        100% { transform: scale(1.15); opacity: 0; }
+      }
+      .support-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: #00000080;
+        backdrop-filter: blur(6px);
+        z-index: 999;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 300ms ease;
+      }
+      .support-modal-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .support-modal-inner {
+        background: #111114;
+        border: 1px solid #1E1E24;
+        border-radius: 16px 16px 0 0;
+        padding: 32px 28px 48px;
+        width: 100%;
+        max-width: 600px;
+        max-height: 85vh;
+        overflow-y: auto;
+        transform: translateY(40px);
+        transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+      }
+      .support-modal-overlay.active .support-modal-inner {
+        transform: translateY(0);
+      }
+      .support-modal-inner::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: #1E1E24;
+        border-radius: 999px;
+        margin: 0 auto 28px;
+      }
+      .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: 1px solid #1E1E24;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6B6B7A;
+        cursor: pointer;
+        transition: all 200ms;
+        z-index: 1;
+      }
+      .modal-close-btn:hover {
+        border-color: #E8193C;
+        color: #F0EEE9;
+      }
 
-      .click-game { margin-top: 20px; text-align: center; }
-      .click-play-btn {
-        width: 72px; height: 72px; border-radius: 50%;
-        background: var(--accent); border: none; cursor: pointer;
-        display: inline-flex; align-items: center; justify-content: center;
-        transition: transform 0.15s ease, box-shadow 0.3s ease;
-        animation: clickPulse 2.5s ease-in-out infinite;
+      /* ═══════════════════════════════════════════
+         SCROLL TO TOP
+         ═══════════════════════════════════════════ */
+      .scroll-top-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: #111114;
+        border: 1px solid #1E1E24;
+        border-radius: 50%;
+        color: #6B6B7A;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: all 200ms ease;
+        z-index: 998;
       }
-      .click-play-btn:hover { transform: scale(1.08); }
-      .click-play-btn:active { transform: scale(0.92); animation: none; }
-      .click-play-btn svg { width: 28px; height: 28px; fill: white; margin-left: 3px; }
-      .click-count {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 36px; color: var(--text-primary);
-        margin-top: 10px; transition: transform 0.15s ease;
+      .scroll-top-btn.visible {
+        opacity: 1;
+        transform: translateY(0);
       }
-      .click-count.pop { transform: scale(1.2); }
-      .click-message {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 13px; font-weight: 500; color: var(--accent);
-        margin-top: 4px; min-height: 20px; transition: opacity 0.3s ease;
+      .scroll-top-btn:hover {
+        border-color: #E8193C;
+        color: #F0EEE9;
       }
 
       /* ═══════════════════════════════════════════
@@ -1051,8 +1124,18 @@
     </style>
   </head>
   <body>
-    <!-- Noise texture overlay -->
     <div class="noise-overlay"></div>
+
+    <!-- Support trigger button -->
+    <button id="supportTrigger" class="support-trigger-btn" onclick="openSupportModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span>Support</span>
+    </button>
+
+    <!-- Scroll to top -->
+    <button id="scrollTop" class="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
 
     <div class="relative z-10 min-h-screen flex flex-col">
       <!-- ═══════════════════════════════════════
@@ -1077,8 +1160,8 @@
         <!-- Headline with glow -->
         <div class="headline-wrapper mb-6 anim-3">
           <div class="headline-glow"></div>
-          <h1 class="headline-text" style="max-width: 800px;">
-            Turn YouTube Channels Into<br/>PDF Pitch Decks
+          <h1 class="headline-text">
+            Turn YouTube Channels<br/>Into PDF Pitch Decks
           </h1>
         </div>
 
@@ -1417,6 +1500,42 @@
 
         </div>
       </section>
+
+      <!-- Support Modal Overlay -->
+      <div id="supportModal" class="support-modal-overlay" onclick="closeSupportModal(event)">
+        <div class="support-modal-inner">
+          <button class="modal-close-btn" onclick="closeSupportModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <!-- Modal support content (mirrors the section) -->
+          <div class="support-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#E8193C" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <h2>Support This Free Tool</h2>
+            <p>Keep this tool free — every contribution helps</p>
+          </div>
+          <div class="tab-bar">
+            <button class="tab-btn" id="modal-tab-international" onclick="switchModalTab('international')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              International
+            </button>
+            <button class="tab-btn" id="modal-tab-iraq" onclick="switchModalTab('iraq')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Iraq
+            </button>
+          </div>
+          <div id="modal-content-international" class="tab-content active">
+            <div class="pay-info-card"><div class="pay-info-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> WHY CRYPTO?</div><p class="pay-info-text">We accept crypto because it works instantly worldwide with zero restrictions and minimal fees. PayPal does not support Iraq, where this tool is built. USDT and Bitcoin are the most reliable way to support us internationally.</p></div>
+            <div class="pay-card" style="--pay-accent:#26A17B;"><div class="pay-card-header"><span class="pay-card-dot" style="background:#26A17B;"></span><span class="pay-card-name">USDT TRC20</span></div><div class="pay-card-value" id="modal-val-usdt">TFrMTT24DXz7rc3ChomzZwAgEcGSe2B3hy</div><div class="pay-card-actions"><button class="pay-copy-btn" onclick="copyPayment('modal-val-usdt', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button><span class="pay-tag">[ zero fees worldwide ]</span></div></div>
+            <div class="pay-card" style="--pay-accent:#F7931A;"><div class="pay-card-header"><span class="pay-card-dot" style="background:#F7931A;"></span><span class="pay-card-name">Bitcoin BTC</span></div><div class="pay-card-value" id="modal-val-btc">14czHZsPDvYSTUyMWiLaH7Er7aDixijDKY</div><div class="pay-card-actions"><button class="pay-copy-btn" onclick="copyPayment('modal-val-btc', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button><span class="pay-tag">[ zero fees worldwide ]</span></div></div>
+          </div>
+          <div id="modal-content-iraq" class="tab-content">
+            <div class="pay-info-card"><div class="pay-info-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> LOCAL PAYMENTS</div><p class="pay-info-text">Based in Iraq? Support directly using local payment methods — FIB bank transfer, Qi Card, or ZainCash. Instant and free of international fees.</p></div>
+            <div class="pay-card" style="--pay-accent:#00A3E0;"><div class="pay-card-header"><span class="pay-card-dot" style="background:#00A3E0;"></span><span class="pay-card-name">FIB</span></div><div class="pay-card-value" id="modal-val-fib">+9647709717662</div><div class="pay-card-actions"><button class="pay-copy-btn" onclick="copyPayment('modal-val-fib', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button><span class="pay-tag">[ instant · no fees ]</span></div></div>
+            <div class="pay-card" style="--pay-accent:#E8193C;"><div class="pay-card-header"><span class="pay-card-dot" style="background:#E8193C;"></span><span class="pay-card-name">Qi Card</span></div><div class="pay-card-value" id="modal-val-qi">7114150373</div><div class="pay-card-actions"><button class="pay-copy-btn" onclick="copyPayment('modal-val-qi', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button><span class="pay-tag">[ instant · no fees ]</span></div></div>
+            <div class="pay-card" style="--pay-accent:#F5A623;"><div class="pay-card-header"><span class="pay-card-dot" style="background:#F5A623;"></span><span class="pay-card-name">ZainCash</span></div><div class="pay-card-value" id="modal-val-zain">+964 7709717662</div><div class="pay-card-actions"><button class="pay-copy-btn" onclick="copyPayment('modal-val-zain', this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button><span class="pay-tag">[ instant · no fees ]</span></div></div>
+          </div>
+        </div>
+      </div>
 
       <!-- ═══════════════════════════════════════
            FOOTER
@@ -1795,6 +1914,7 @@
         const isIraq = tz === 'Asia/Baghdad';
         const defaultTab = isIraq ? 'iraq' : 'international';
         switchTab(defaultTab);
+        switchModalTab(defaultTab);
 
         // Show region notice for Iraqi users
         if (isIraq) {
@@ -1803,7 +1923,59 @@
           notice.classList.add('visible');
           setTimeout(() => notice.classList.remove('visible'), 3000);
         }
+
+        // Animate hero stat counter
+        animateCounter();
       });
+
+      // ─── Support Modal ───
+      function openSupportModal() {
+        document.getElementById('supportModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeSupportModal(e) {
+        if (!e || e.target === document.getElementById('supportModal') || e.currentTarget.classList.contains('modal-close-btn')) {
+          document.getElementById('supportModal').classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeSupportModal();
+      });
+
+      // ─── Modal Tab Switching ───
+      function switchModalTab(tab) {
+        document.getElementById('modal-tab-international').classList.toggle('active', tab === 'international');
+        document.getElementById('modal-tab-iraq').classList.toggle('active', tab === 'iraq');
+
+        const intl = document.getElementById('modal-content-international');
+        const iraq = document.getElementById('modal-content-iraq');
+        intl.classList.toggle('active', tab === 'international');
+        iraq.classList.toggle('active', tab === 'iraq');
+        intl.style.opacity = tab === 'international' ? '1' : '0';
+        iraq.style.opacity = tab === 'iraq' ? '1' : '0';
+      }
+
+      // ─── Scroll to Top ───
+      window.addEventListener('scroll', () => {
+        const btn = document.getElementById('scrollTop');
+        btn.classList.toggle('visible', window.scrollY > 400);
+      });
+
+      // ─── Animated Counter ───
+      function animateCounter() {
+        const el = document.querySelector('.hero-credibility');
+        if (!el) return;
+        const base = 847;
+        const variance = Math.floor(Math.random() * 40) - 10;
+        const target = base + variance;
+        let current = target - 30;
+        const interval = setInterval(() => {
+          current++;
+          el.textContent = '> ' + current + ' pitch decks generated this week';
+          if (current >= target) clearInterval(interval);
+        }, 40);
+      }
     </script>
   </body>
 </html>

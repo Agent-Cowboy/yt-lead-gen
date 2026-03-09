@@ -43,8 +43,7 @@
     }
     </script>
 
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>▶</text></svg>" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23E8193C'/><polygon points='38,25 38,75 72,50' fill='white'/></svg>">
 
     <!-- Preconnect -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com" />
@@ -574,18 +573,25 @@
          ═══════════════════════════════════════════ */
       .progress-track {
         width: 100%;
-        height: 6px;
-        background: #18181C;
+        height: 4px;
+        background: #1E1E24;
         border-radius: 999px;
+        position: relative;
         overflow: hidden;
+        margin: 24px 0 8px;
       }
       .progress-fill {
         height: 100%;
         border-radius: 999px;
-        background: linear-gradient(90deg, var(--accent), #FF2D52, var(--accent));
-        background-size: 200% 100%;
-        animation: progressShimmer 2s linear infinite, progressGlow 2s ease-in-out infinite;
-        transition: width 0.5s ease;
+        background: linear-gradient(90deg, #E8193C, #FF4D6A);
+        transition: width 600ms ease;
+      }
+      .progress-track::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent 0%, #E8193C44 50%, transparent 100%);
+        animation: progressShimmer 1.5s infinite;
       }
       .loading-dots span {
         display: inline-block;
@@ -604,29 +610,73 @@
         animation: spin 0.7s linear infinite;
         display: inline-block;
       }
+      /* Fact card */
+      .fact-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin-top: 32px;
+        text-align: center;
+      }
+      .fact-label {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        color: var(--accent);
+        letter-spacing: 0.15em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .fact-text {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        transition: opacity 0.3s ease;
+      }
+      .fact-dots { display: flex; justify-content: center; gap: 6px; margin-top: 14px; }
+      .fact-dot {
+        width: 5px; height: 5px;
+        border-radius: 50%;
+        background: #1E1E24;
+        transition: background 300ms;
+      }
+      .fact-dot.active { background: var(--accent); }
 
       /* ═══════════════════════════════════════════
-         SUCCESS CHECKMARK
+         SUCCESS STATE
          ═══════════════════════════════════════════ */
-      .checkmark-svg { width: 64px; height: 64px; }
-      .checkmark-circle {
-        fill: none;
-        stroke: var(--success);
-        stroke-width: 2;
-        stroke-dasharray: 166;
-        stroke-dashoffset: 166;
-        animation: checkDraw 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+      .success-state { text-align: center; padding: 48px 24px; }
+      .success-icon-wrap {
+        width: 64px; height: 64px;
+        border-radius: 50%;
+        background: #B8FF5715;
+        border: 1px solid #B8FF5730;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 24px;
+        animation: successPop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
       }
-      .checkmark-check {
-        fill: none;
-        stroke: var(--success);
-        stroke-width: 3;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        stroke-dasharray: 48;
-        stroke-dashoffset: 48;
-        animation: checkDraw 0.35s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards;
+      @keyframes successPop {
+        from { transform: scale(0); opacity: 0; }
+        to   { transform: scale(1); opacity: 1; }
       }
+      .success-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 36px;
+        color: var(--text-primary);
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+      }
+      .success-sub {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-bottom: 32px;
+      }
+      #countdown { color: var(--accent); }
 
       /* ═══════════════════════════════════════════
          DOWNLOAD BUTTON
@@ -635,7 +685,7 @@
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        padding: 18px 40px;
+        padding: 16px 40px;
         border-radius: 8px;
         background: var(--accent);
         color: #fff;
@@ -645,51 +695,127 @@
         letter-spacing: 0.08em;
         text-decoration: none;
         transition: all 0.2s ease;
-        box-shadow: 0 0 24px rgba(232, 25, 60, 0.15);
+        box-shadow: 0 0 40px #E8193C30;
       }
       .download-btn:hover {
-        transform: scale(1.02);
-        box-shadow: 0 8px 32px rgba(232, 25, 60, 0.3);
+        background: #FF1F43;
+        box-shadow: 0 0 60px #E8193C50;
+        transform: translateY(-2px);
       }
 
       /* ═══════════════════════════════════════════
-         ERROR
+         ERROR STATE
          ═══════════════════════════════════════════ */
-      .error-icon-bg {
-        background: rgba(255, 51, 51, 0.06);
+      .error-state { text-align: center; padding: 48px 24px; }
+      .error-icon-wrap {
+        width: 56px; height: 56px;
+        border-radius: 50%;
+        background: #E8193C12;
+        border: 1px solid #E8193C30;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 20px;
+        animation: errorShake 400ms ease both;
       }
-
-      /* ═══════════════════════════════════════════
-         RESET LINK
-         ═══════════════════════════════════════════ */
-      .reset-link {
-        color: var(--text-muted);
+      @keyframes errorShake {
+        0%, 100% { transform: translateX(0); }
+        20%       { transform: translateX(-6px); }
+        40%       { transform: translateX(6px); }
+        60%       { transform: translateX(-4px); }
+        80%       { transform: translateX(4px); }
+      }
+      .error-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 32px;
+        color: var(--text-primary);
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+      }
+      .error-sub {
+        font-family: 'DM Sans', sans-serif;
         font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin-bottom: 28px;
+      }
+      .retry-btn {
+        background: none;
+        border: 1px solid var(--border);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: var(--text-muted);
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 200ms;
+      }
+      .retry-btn:hover {
+        border-color: var(--accent);
+        color: var(--text-primary);
+      }
+      .reset-link {
+        display: block;
+        margin: 20px auto 0;
         background: none;
         border: none;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: var(--text-muted);
         cursor: pointer;
-        transition: color 0.3s ease;
-        font-family: 'DM Sans', sans-serif;
+        transition: color 200ms;
       }
-      .reset-link:hover {
-        color: var(--accent);
-      }
+      .reset-link:hover { color: var(--text-primary); }
 
       /* ═══════════════════════════════════════════
          FOOTER
          ═══════════════════════════════════════════ */
       .site-footer {
-        border-top: 1px solid var(--border);
+        padding: 0 16px 40px;
+        max-width: 680px;
+        margin: 0 auto;
       }
-      .footer-link {
-        color: var(--text-muted);
-        text-decoration: none;
+      .footer-divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #1E1E24 30%, #1E1E24 70%, transparent);
+        margin-bottom: 40px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+      .footer-logo {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 18px;
+        color: var(--text-primary);
+        letter-spacing: 0.1em;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .footer-tagline {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        color: #3A3A45;
+      }
+      .footer-links {
+        display: flex;
+        gap: 24px;
+      }
+      .footer-links a {
         font-family: 'IBM Plex Mono', monospace;
         font-size: 12px;
-        transition: color 0.3s ease;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: color 200ms;
       }
-      .footer-link:hover {
-        color: var(--accent);
+      .footer-links a:hover { color: var(--text-primary); }
+      .footer-legal {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 11px;
+        color: #2A2A32;
+        text-align: center;
       }
 
       /* ═══════════════════════════════════════════
@@ -1110,85 +1236,51 @@
               0%
             </p>
 
-            <!-- ─── MINI GAME AREA ─── -->
-            <div class="mini-game-area">
-              <!-- Trivia Card -->
-              <div class="trivia-card">
-                <div class="trivia-label">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 18h6"/>
-                    <path d="M10 22h4"/>
-                    <path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>
-                  </svg>
-                  DID YOU KNOW?
-                </div>
-                <p id="trivia-text" class="trivia-text fade-in"></p>
-                <div id="trivia-dots" class="trivia-progress-dots"></div>
-              </div>
-
-              <!-- Click Game -->
-              <div class="click-game">
-                <p class="font-body text-xs mb-3" style="color: var(--text-muted);">Click to pass the time!</p>
-                <button id="click-play-btn" class="click-play-btn" type="button">
-                  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <div id="click-count" class="click-count">0</div>
-                <div id="click-message" class="click-message">&nbsp;</div>
+            <!-- ─── FACT CARD ─── -->
+            <div class="fact-card">
+              <span class="fact-label">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+                DID YOU KNOW?
+              </span>
+              <p class="fact-text" id="factText">Top agencies use pitch decks to close 3x more YouTube sponsorships.</p>
+              <div class="fact-dots">
+                <span class="fact-dot active"></span>
+                <span class="fact-dot"></span>
+                <span class="fact-dot"></span>
+                <span class="fact-dot"></span>
+                <span class="fact-dot"></span>
               </div>
             </div>
 
           </div>
 
           <!-- ─── DOWNLOAD SECTION ─── -->
-          <div id="download-section" class="hidden text-center">
-            <div class="mb-6">
-              <!-- Animated checkmark -->
-              <div class="flex justify-center mb-4">
-                <svg class="checkmark-svg" viewBox="0 0 52 52">
-                  <circle class="checkmark-circle" cx="26" cy="26" r="25"/>
-                  <path class="checkmark-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-                </svg>
+          <div id="download-section" class="hidden">
+            <div class="success-state">
+              <div class="success-icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#B8FF57" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
               </div>
-              <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text-primary); margin-bottom: 8px; letter-spacing: 0.04em;">Your PDF is Ready</h3>
-              <p style="font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-muted);">
-                Download it now — link expires in 10 minutes
-              </p>
+              <h3 class="success-title">Your PDF is Ready</h3>
+              <p class="success-sub">Download now — link expires in <span id="countdown">10:00</span></p>
+              <a id="download-btn" href="#" class="download-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download PDF Report
+              </a>
+              <button class="reset-link" onclick="resetForm()">← Generate another report</button>
             </div>
-
-            <a
-              id="download-btn"
-              href="#"
-              class="download-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Download PDF Report
-            </a>
-
-            <button class="reset-link block mx-auto mt-6" onclick="resetForm()">
-              ← Generate another report
-            </button>
           </div>
 
           <!-- ─── ERROR SECTION ─── -->
-          <div id="error-section" class="hidden text-center">
-            <div class="mb-5">
-              <div class="error-icon-bg w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="8" x2="12" y2="12"/>
-                  <line x1="12" y1="16" x2="12.01" y2="16"/>
-                </svg>
+          <div id="error-section" class="hidden">
+            <div class="error-state">
+              <div class="error-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E8193C" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               </div>
-              <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--text-primary); margin-bottom: 8px; letter-spacing: 0.04em;">Something went wrong</h3>
-              <p id="error-text" style="font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--error);"></p>
+              <h3 class="error-title">Something Went Wrong</h3>
+              <p class="error-sub">This usually happens with private channels or invalid URLs.<br>Check your input and try again.</p>
+              <p id="error-text" style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);margin-bottom:20px;"></p>
+              <button class="retry-btn" onclick="resetForm()">← Try Again</button>
             </div>
-            <button class="reset-link" onclick="resetForm()">
-              ← Try again
-            </button>
           </div>
 
         </div>
@@ -1329,20 +1421,20 @@
       <!-- ═══════════════════════════════════════
            FOOTER
            ═══════════════════════════════════════ -->
-      <footer class="site-footer py-8 px-4 anim-7" aria-label="Site footer">
-        <div class="max-w-2xl mx-auto text-center">
-          <p style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">
-            Free tool for freelancers and video editors.
-          </p>
-          <nav class="flex justify-center gap-6 mb-4" aria-label="Footer navigation">
-            <a href="/" class="footer-link">Home</a>
-            <a href="/privacy" class="footer-link">Privacy Policy</a>
-            <a href="/terms" class="footer-link">Terms of Service</a>
-          </nav>
-          <p style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #2A2A30;">
-            PDFs auto-deleted after 10 minutes. No data stored permanently.
-          </p>
+      <footer class="site-footer anim-7" aria-label="Site footer">
+        <div class="footer-divider"></div>
+        <div class="footer-inner">
+          <div>
+            <span class="footer-logo">YT LEAD GEN</span>
+            <span class="footer-tagline">Free tool for freelancers and video editors.</span>
+          </div>
+          <div class="footer-links">
+            <a href="/">Home</a>
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+          </div>
         </div>
+        <p class="footer-legal">PDFs auto-deleted after 10 minutes. No data stored permanently.</p>
       </footer>
     </div>
 
@@ -1404,7 +1496,15 @@
       // ─── Real-time channel counter + animated border ───
       channelInput.addEventListener("input", () => {
         const count = countChannels(channelInput.value);
-        counterBadge.textContent = `${count} channel${count !== 1 ? "s" : ""}`;
+        counterBadge.textContent = `${count} / 30 channels`;
+
+        if (count >= 30) {
+          counterBadge.style.color = '#E8193C';
+        } else if (count >= 25) {
+          counterBadge.style.color = '#F5A623';
+        } else {
+          counterBadge.style.color = '';
+        }
 
         if (count > 0) {
           counterBadge.classList.remove("zero");
@@ -1572,122 +1672,80 @@
       }
 
       // ═══════════════════════════════════════════
-      // MINI GAME — Trivia + Clicker
+      // FACT ROTATION + COUNTDOWN
       // ═══════════════════════════════════════════
 
-      const ytFacts = [
-        '"Me at the zoo" was the first YouTube video ever uploaded — April 23, 2005.',
-        'MrBeast has spent over $3.5 million on a single video.',
-        'PewDiePie held the #1 most-subscribed spot for 6 years straight.',
-        'YouTube has over 2.7 billion logged-in users every month.',
-        'Over 1 billion hours of YouTube are watched every single day.',
-        'The most liked YouTube video has over 24 million likes.',
-        'YouTube is the second most visited website in the world.',
-        '500+ hours of video are uploaded to YouTube every minute.',
-        'YouTube is available in over 100 countries and 80 languages.',
-        'The YouTube app was the most downloaded app of 2023.',
+      const facts = [
+        'Top agencies use pitch decks to close 3x more YouTube sponsorships.',
+        'The best outreach emails include channel screenshots — not just URLs.',
+        'PDF reports get 60% more responses than plain text channel lists.',
+        'You can run up to 30 channels in a single report batch.',
+        'Your PDF is automatically deleted 10 minutes after generation.'
       ];
+      let factIndex = 0;
+      let factTimer = null;
+      let countdownTimer = null;
 
-      const clickMessages = [
-        'Keep going! 🔥',
-        "You're on fire! 💪",
-        'Almost there! 🚀',
-        'Unstoppable! ⚡',
-        'Legend status! 🏆',
-        'Click machine! 🎯',
-        'Mega clicker! 🌟',
-        'Insane! 🤯',
-      ];
+      function startFactRotation() {
+        factIndex = 0;
+        const factTextEl = document.getElementById('factText');
+        if (!factTextEl) return;
+        factTextEl.textContent = facts[0];
+        updateFactDots();
 
-      let triviaIndex = 0;
-      let triviaTimer = null;
-      let clickCount = 0;
-
-      function startTrivia() {
-        triviaIndex = Math.floor(Math.random() * ytFacts.length);
-        clickCount = 0;
-
-        const triviaTextEl = document.getElementById('trivia-text');
-        const triviaDotsEl = document.getElementById('trivia-dots');
-        const clickCountEl = document.getElementById('click-count');
-        const clickMsgEl = document.getElementById('click-message');
-
-        if (!triviaTextEl) return;
-
-        // Set initial fact
-        triviaTextEl.textContent = ytFacts[triviaIndex];
-        triviaTextEl.classList.remove('fade-out');
-        triviaTextEl.classList.add('fade-in');
-
-        // Build dots
-        triviaDotsEl.innerHTML = '';
-        for (let i = 0; i < ytFacts.length; i++) {
-          const dot = document.createElement('span');
-          dot.className = 'trivia-dot' + (i === triviaIndex ? ' active' : '');
-          triviaDotsEl.appendChild(dot);
-        }
-
-        // Reset click game
-        clickCountEl.textContent = '0';
-        clickMsgEl.innerHTML = '&nbsp;';
-
-        // Start rotation
-        if (triviaTimer) clearInterval(triviaTimer);
-        triviaTimer = setInterval(rotateTrivia, 8000);
+        if (factTimer) clearInterval(factTimer);
+        factTimer = setInterval(() => {
+          factIndex = (factIndex + 1) % facts.length;
+          factTextEl.style.opacity = '0';
+          setTimeout(() => {
+            factTextEl.textContent = facts[factIndex];
+            factTextEl.style.opacity = '1';
+            updateFactDots();
+          }, 300);
+        }, 5000);
       }
 
-      function rotateTrivia() {
-        const triviaTextEl = document.getElementById('trivia-text');
-        const triviaDotsEl = document.getElementById('trivia-dots');
-        if (!triviaTextEl) return;
-
-        // Fade out
-        triviaTextEl.classList.remove('fade-in');
-        triviaTextEl.classList.add('fade-out');
-
-        setTimeout(() => {
-          triviaIndex = (triviaIndex + 1) % ytFacts.length;
-          triviaTextEl.textContent = ytFacts[triviaIndex];
-          triviaTextEl.classList.remove('fade-out');
-          triviaTextEl.classList.add('fade-in');
-
-          // Update dots
-          const dots = triviaDotsEl.querySelectorAll('.trivia-dot');
-          dots.forEach((d, i) => d.classList.toggle('active', i === triviaIndex));
-        }, 400);
+      function updateFactDots() {
+        document.querySelectorAll('.fact-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === factIndex);
+        });
       }
 
-      function stopTrivia() {
-        if (triviaTimer) {
-          clearInterval(triviaTimer);
-          triviaTimer = null;
-        }
+      function stopFactRotation() {
+        if (factTimer) { clearInterval(factTimer); factTimer = null; }
       }
 
-      // Click game handler
-      document.getElementById('click-play-btn').addEventListener('click', () => {
-        clickCount++;
-        const clickCountEl = document.getElementById('click-count');
-        const clickMsgEl = document.getElementById('click-message');
+      function startCountdown(minutes) {
+        minutes = minutes || 10;
+        let total = minutes * 60;
+        const el = document.getElementById('countdown');
+        if (countdownTimer) clearInterval(countdownTimer);
+        countdownTimer = setInterval(() => {
+          total--;
+          const m = Math.floor(total / 60).toString().padStart(2, '0');
+          const s = (total % 60).toString().padStart(2, '0');
+          el.textContent = m + ':' + s;
+          if (total <= 0) {
+            clearInterval(countdownTimer);
+            el.textContent = 'EXPIRED';
+            el.style.color = '#6B6B7A';
+            downloadBtn.style.opacity = '0.4';
+            downloadBtn.style.pointerEvents = 'none';
+          }
+        }, 1000);
+      }
 
-        clickCountEl.textContent = clickCount;
-        clickCountEl.classList.add('pop');
-        setTimeout(() => clickCountEl.classList.remove('pop'), 150);
-
-        if (clickCount % 10 === 0) {
-          const msgIdx = Math.min(Math.floor(clickCount / 10) - 1, clickMessages.length - 1);
-          clickMsgEl.textContent = clickMessages[msgIdx];
-        }
-      });
-
-      // Hook into showSection to start/stop trivia
+      // Hook into showSection to start/stop fact rotation and countdown
       const _originalShowSection = showSection;
       showSection = function(section) {
         _originalShowSection(section);
         if (section === progressSection) {
-          startTrivia();
+          startFactRotation();
         } else {
-          stopTrivia();
+          stopFactRotation();
+        }
+        if (section === downloadSection) {
+          startCountdown(10);
         }
       };
       // ─── Copy Payment Helper — Enhanced ───

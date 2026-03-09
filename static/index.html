@@ -722,77 +722,117 @@
       }
 
       /* ═══════════════════════════════════════════
-         SUPPORT SECTION
+         SUPPORT SECTION — Tabbed Interface
          ═══════════════════════════════════════════ */
       .support-section { padding: 120px 16px 60px; }
       .support-card-outer {
-        max-width: 780px; margin: 0 auto;
+        max-width: 680px; margin: 0 auto;
         background: var(--bg-surface); border: 1px solid var(--border);
         border-radius: 12px; padding: 36px 32px;
       }
-      .support-title {
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 32px; color: var(--text-primary);
-        text-align: center; margin-bottom: 6px; letter-spacing: 0.04em;
-      }
-      .support-subtitle {
-        font-family: 'DM Sans', sans-serif;
-        font-size: 14px; color: var(--text-muted);
+      .support-header {
         text-align: center; margin-bottom: 28px;
       }
-      .support-grid {
-        display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+      .support-header svg { margin-bottom: 12px; }
+      .support-header h2 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 32px; color: var(--text-primary);
+        letter-spacing: 0.04em; margin-bottom: 6px;
       }
-      .support-col-label {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 11px; font-weight: 500;
-        letter-spacing: 0.12em; text-transform: uppercase;
-        color: var(--text-muted); margin-bottom: 12px;
+      .support-header p {
+        font-family: 'DM Sans', sans-serif;
+        font-size: 14px; color: var(--text-muted);
       }
-      .pay-card {
+      /* Tab bar */
+      .tab-bar {
+        display: flex; gap: 4px;
         background: var(--bg-base); border: 1px solid var(--border);
-        border-radius: 12px; padding: 16px; margin-bottom: 12px;
+        border-radius: 999px; padding: 4px;
+        margin-bottom: 24px;
+      }
+      .tab-btn {
+        flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+        padding: 10px 16px; border: 1px solid transparent; border-radius: 999px;
+        font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500;
+        background: transparent; color: var(--text-muted);
+        cursor: pointer; transition: all 0.2s ease;
+      }
+      .tab-btn:hover { color: var(--text-primary); }
+      .tab-btn.active {
+        background: var(--accent); color: #fff; border-color: transparent;
+      }
+      .tab-btn svg { flex-shrink: 0; }
+      /* Tab content */
+      .tab-content { display: none; }
+      .tab-content.active { display: block; animation: fadeIn 0.2s ease; }
+      /* Region notice */
+      .region-notice {
+        font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+        color: var(--text-muted); text-align: center; margin-bottom: 16px;
+        opacity: 0; transition: opacity 0.4s ease;
+      }
+      .region-notice.visible { opacity: 1; }
+      /* Info card */
+      .pay-info-card {
+        background: var(--bg-surface); border: 1px solid var(--border);
+        border-radius: 10px; padding: 20px 24px; margin-bottom: 16px;
+      }
+      .pay-info-label {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 500;
+        color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em;
+        margin-bottom: 8px;
+      }
+      .pay-info-label svg { width: 14px; height: 14px; }
+      .pay-info-text {
+        font-family: 'DM Sans', sans-serif; font-size: 14px;
+        line-height: 1.6; color: var(--text-muted);
+      }
+      /* Payment cards */
+      .pay-card {
+        background: #0D0D10; border: 1px solid var(--border);
+        border-radius: 10px; padding: 20px 24px; margin-bottom: 12px;
         transition: border-color 0.3s ease;
       }
       .pay-card:hover { border-color: #2A2A32; }
-      .pay-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+      .pay-card-header {
+        display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+      }
       .pay-card-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
       .pay-card-name {
         font-family: 'IBM Plex Mono', monospace;
         font-size: 13px; font-weight: 500; color: var(--text-primary);
       }
       .pay-card-value {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px; color: var(--text-muted);
-        word-break: break-all; background: rgba(255,255,255,0.02);
-        border-radius: 6px; padding: 8px 10px; margin-bottom: 8px; line-height: 1.5;
+        font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+        color: var(--text-muted); word-break: break-all;
+        background: rgba(255,255,255,0.02); border-radius: 6px;
+        padding: 10px 12px; margin-bottom: 12px; line-height: 1.5;
+      }
+      .pay-card-actions {
+        display: flex; align-items: center; gap: 12px;
       }
       .pay-copy-btn {
         display: inline-flex; align-items: center; gap: 5px;
         background: none; border: 1px solid var(--border);
         color: var(--text-muted); font-family: 'IBM Plex Mono', monospace;
-        font-size: 11px; font-weight: 500; padding: 5px 12px;
+        font-size: 11px; font-weight: 500; padding: 6px 14px;
         border-radius: 6px; cursor: pointer; transition: all 0.2s ease;
       }
       .pay-copy-btn:hover { border-color: #3A3A44; color: var(--text-primary); }
-      .pay-copy-btn svg { width: 13px; height: 13px; }
-      .pay-label-note {
+      .pay-copy-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+      .pay-tag {
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 11px; color: var(--text-muted); margin-top: 4px;
+        font-size: 10px; color: var(--text-muted);
       }
-      .pay-info-card {
-        background: #14141A; border-radius: 10px;
-        padding: 14px 16px; margin-bottom: 14px;
-        border: 1px solid var(--border);
-      }
-      .pay-info-card-heading {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px; font-weight: 600;
-        color: var(--text-primary); margin-bottom: 6px;
-      }
-      .pay-info-card-text {
-        font-family: 'DM Sans', sans-serif;
-        font-size: 12px; line-height: 1.6; color: #7A7A8A;
+      /* Stagger reveal */
+      .pay-card-reveal { opacity: 0; animation: fadeInUp 0.4s ease forwards; }
+      .pay-card-reveal:nth-child(2) { animation-delay: 0.08s; }
+      .pay-card-reveal:nth-child(3) { animation-delay: 0.16s; }
+      .pay-card-reveal:nth-child(4) { animation-delay: 0.24s; }
+      @media (max-width: 768px) {
+        .support-card-outer { padding: 24px 16px; }
+        .pay-card-value { font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       }
     </style>
   </head>
@@ -1040,101 +1080,134 @@
       </main>
 
       <!-- ═══════════════════════════════════════
-           SUPPORT SECTION
+           SUPPORT SECTION — Tabbed
            ═══════════════════════════════════════ -->
       <section class="support-section" aria-label="Support this tool">
         <div class="support-card-outer">
-          <h2 class="support-title">Support This Free Tool <span style="color:#E8193C;">❤️</span></h2>
-          <p class="support-subtitle">Keep this tool free — every contribution helps!</p>
+          <!-- Header with heart SVG -->
+          <div class="support-header">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#E8193C" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <h2>Support This Free Tool</h2>
+            <p>Keep this tool free — every contribution helps</p>
+          </div>
 
-          <div class="support-grid">
-            <!-- ─── Left Column: International ─── -->
-            <div>
-              <div class="support-col-label">🌍 International Payments</div>
+          <!-- Region notice -->
+          <div id="region-notice" class="region-notice"></div>
 
-              <div class="pay-info-card">
-                <div class="pay-info-card-heading">ℹ️ International Supporters 🌍</div>
-                <p class="pay-info-card-text">We accept crypto because it works instantly worldwide with zero restrictions and minimal fees. We currently cannot accept PayPal because PayPal does not support Iraq where this tool is built and maintained. USDT and Bitcoin are the most reliable way to support us internationally.</p>
+          <!-- Tab bar -->
+          <div class="tab-bar">
+            <button class="tab-btn" id="tab-international" onclick="switchTab('international')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              International
+            </button>
+            <button class="tab-btn" id="tab-iraq" onclick="switchTab('iraq')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Iraq
+            </button>
+          </div>
+
+          <!-- ─── International Tab ─── -->
+          <div id="content-international" class="tab-content">
+            <div class="pay-info-card pay-card-reveal">
+              <div class="pay-info-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                WHY CRYPTO?
               </div>
+              <p class="pay-info-text">We accept crypto because it works instantly worldwide with zero restrictions and minimal fees. PayPal does not support Iraq, where this tool is built. USDT and Bitcoin are the most reliable way to support us internationally.</p>
+            </div>
 
-              <!-- USDT TRC20 -->
-              <div class="pay-card">
-                <div class="pay-card-header">
-                  <span class="pay-card-dot" style="background:#26A17B;"></span>
-                  <span class="pay-card-name">USDT TRC20</span>
-                </div>
-                <div class="pay-card-value" id="val-usdt">TFrMTT24DXz7rc3ChomzZwAgEcGSe2B3hy</div>
+            <!-- USDT TRC20 -->
+            <div class="pay-card pay-card-reveal">
+              <div class="pay-card-header">
+                <span class="pay-card-dot" style="background:#26A17B;"></span>
+                <span class="pay-card-name">USDT TRC20</span>
+              </div>
+              <div class="pay-card-value" id="val-usdt">TFrMTT24DXz7rc3ChomzZwAgEcGSe2B3hy</div>
+              <div class="pay-card-actions">
                 <button class="pay-copy-btn" onclick="copyPayment('val-usdt', this)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                   Copy
                 </button>
-                <div class="pay-label-note">Crypto — works worldwide, zero fees</div>
-              </div>
-
-              <!-- Bitcoin BTC -->
-              <div class="pay-card">
-                <div class="pay-card-header">
-                  <span class="pay-card-dot" style="background:#F7931A;"></span>
-                  <span class="pay-card-name">Bitcoin BTC</span>
-                </div>
-                <div class="pay-card-value" id="val-btc">14czHZsPDvYSTUyMWiLaH7Er7aDixijDKY</div>
-                <button class="pay-copy-btn" onclick="copyPayment('val-btc', this)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  Copy
-                </button>
-                <div class="pay-label-note">Crypto — works worldwide, zero fees</div>
+                <span class="pay-tag">[ zero fees worldwide ]</span>
               </div>
             </div>
 
-            <!-- ─── Right Column: Iraqi ─── -->
-            <div>
-              <div class="support-col-label">🇮🇶 Iraqi Payments</div>
-
-              <div class="pay-info-card">
-                <div class="pay-info-card-heading">ℹ️ Iraqi Supporters 🇮🇶</div>
-                <p class="pay-info-card-text">If you are based in Iraq you can support directly using local payment methods — FIB bank transfer, Qi Card, or ZainCash. These are instant and free of international fees.</p>
+            <!-- Bitcoin BTC -->
+            <div class="pay-card pay-card-reveal">
+              <div class="pay-card-header">
+                <span class="pay-card-dot" style="background:#F7931A;"></span>
+                <span class="pay-card-name">Bitcoin BTC</span>
               </div>
-
-              <!-- FIB -->
-              <div class="pay-card">
-                <div class="pay-card-header">
-                  <span class="pay-card-dot" style="background:#2196F3;"></span>
-                  <span class="pay-card-name">FIB</span>
-                </div>
-                <div class="pay-card-value" id="val-fib">+9647709717662</div>
-                <button class="pay-copy-btn" onclick="copyPayment('val-fib', this)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <div class="pay-card-value" id="val-btc">14czHZsPDvYSTUyMWiLaH7Er7aDixijDKY</div>
+              <div class="pay-card-actions">
+                <button class="pay-copy-btn" onclick="copyPayment('val-btc', this)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                   Copy
                 </button>
-              </div>
-
-              <!-- Qi Card -->
-              <div class="pay-card">
-                <div class="pay-card-header">
-                  <span class="pay-card-dot" style="background:#E53935;"></span>
-                  <span class="pay-card-name">Qi Card</span>
-                </div>
-                <div class="pay-card-value" id="val-qi">7114150373</div>
-                <button class="pay-copy-btn" onclick="copyPayment('val-qi', this)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  Copy
-                </button>
-              </div>
-
-              <!-- ZainCash -->
-              <div class="pay-card">
-                <div class="pay-card-header">
-                  <span class="pay-card-dot" style="background:#FFD600;"></span>
-                  <span class="pay-card-name">ZainCash</span>
-                </div>
-                <div class="pay-card-value" id="val-zain">+964 7709717662</div>
-                <button class="pay-copy-btn" onclick="copyPayment('val-zain', this)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  Copy
-                </button>
+                <span class="pay-tag">[ zero fees worldwide ]</span>
               </div>
             </div>
           </div>
+
+          <!-- ─── Iraq Tab ─── -->
+          <div id="content-iraq" class="tab-content">
+            <div class="pay-info-card pay-card-reveal">
+              <div class="pay-info-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                LOCAL PAYMENTS
+              </div>
+              <p class="pay-info-text">Based in Iraq? Support directly using local payment methods — FIB bank transfer, Qi Card, or ZainCash. Instant and free of international fees.</p>
+            </div>
+
+            <!-- FIB -->
+            <div class="pay-card pay-card-reveal">
+              <div class="pay-card-header">
+                <span class="pay-card-dot" style="background:#00A3E0;"></span>
+                <span class="pay-card-name">FIB</span>
+              </div>
+              <div class="pay-card-value" id="val-fib">+9647709717662</div>
+              <div class="pay-card-actions">
+                <button class="pay-copy-btn" onclick="copyPayment('val-fib', this)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy
+                </button>
+                <span class="pay-tag">[ instant · no fees ]</span>
+              </div>
+            </div>
+
+            <!-- Qi Card -->
+            <div class="pay-card pay-card-reveal">
+              <div class="pay-card-header">
+                <span class="pay-card-dot" style="background:#E8193C;"></span>
+                <span class="pay-card-name">Qi Card</span>
+              </div>
+              <div class="pay-card-value" id="val-qi">7114150373</div>
+              <div class="pay-card-actions">
+                <button class="pay-copy-btn" onclick="copyPayment('val-qi', this)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy
+                </button>
+                <span class="pay-tag">[ instant · no fees ]</span>
+              </div>
+            </div>
+
+            <!-- ZainCash -->
+            <div class="pay-card pay-card-reveal">
+              <div class="pay-card-header">
+                <span class="pay-card-dot" style="background:#F5A623;"></span>
+                <span class="pay-card-name">ZainCash</span>
+              </div>
+              <div class="pay-card-value" id="val-zain">+964 7709717662</div>
+              <div class="pay-card-actions">
+                <button class="pay-copy-btn" onclick="copyPayment('val-zain', this)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copy
+                </button>
+                <span class="pay-tag">[ instant · no fees ]</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1502,14 +1575,14 @@
           stopTrivia();
         }
       };
-      // ─── Copy Payment Helper ───
+      // ─── Copy Payment Helper — Enhanced ───
       function copyPayment(elementId, btn) {
         const text = document.getElementById(elementId).textContent.trim();
         navigator.clipboard.writeText(text).then(() => {
           const original = btn.innerHTML;
-          btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px;"><polyline points="20 6 9 17 4 12"/></svg> Copied! ✓';
-          btn.style.borderColor = '#26A17B';
-          btn.style.color = '#26A17B';
+          btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B8FF57" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+          btn.style.borderColor = '#B8FF57';
+          btn.style.color = '#B8FF57';
           setTimeout(() => {
             btn.innerHTML = original;
             btn.style.borderColor = '';
@@ -1517,6 +1590,47 @@
           }, 2000);
         });
       }
+
+      // ─── Tab Switching ───
+      function switchTab(tab) {
+        // Update tab buttons
+        document.getElementById('tab-international').classList.toggle('active', tab === 'international');
+        document.getElementById('tab-iraq').classList.toggle('active', tab === 'iraq');
+
+        // Hide all tab content
+        const allContent = document.querySelectorAll('.tab-content');
+        allContent.forEach(el => {
+          el.classList.remove('active');
+          el.style.opacity = '0';
+        });
+
+        // Show selected tab content with fade
+        const target = document.getElementById('content-' + tab);
+        setTimeout(() => {
+          target.classList.add('active');
+          target.style.opacity = '0';
+          requestAnimationFrame(() => {
+            target.style.transition = 'opacity 0.2s ease';
+            target.style.opacity = '1';
+          });
+        }, 150);
+      }
+
+      // ─── Geo-Aware Default Tab ───
+      document.addEventListener('DOMContentLoaded', () => {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const isIraq = tz === 'Asia/Baghdad';
+        const defaultTab = isIraq ? 'iraq' : 'international';
+        switchTab(defaultTab);
+
+        // Show region notice for Iraqi users
+        if (isIraq) {
+          const notice = document.getElementById('region-notice');
+          notice.textContent = 'Showing Iraqi payment options for your region';
+          notice.classList.add('visible');
+          setTimeout(() => notice.classList.remove('visible'), 3000);
+        }
+      });
     </script>
   </body>
 </html>
